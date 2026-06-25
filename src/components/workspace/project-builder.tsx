@@ -34,7 +34,7 @@ import { PublishPanel } from "@/components/workspace/publish-panel";
 import { getTemplate } from "@/lib/templates";
 
 const PROMPT_STORAGE_KEY = "foundrr:prompt";
-const BUILD_COST = 50;
+const BUILD_COST = 85;
 
 interface ProjectFile {
   path: string;

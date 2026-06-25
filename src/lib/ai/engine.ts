@@ -1,6 +1,6 @@
 /** Foundrr generation engine config + prompts (runs on OpenAI). */
 
-export const CREDIT_COSTS = { plan: 1, build: 50, edit: 2, fix: 0 } as const;
+export const CREDIT_COSTS = { plan: 5, build: 85, edit: 12, fix: 5 } as const;
 export type GenerateMode = keyof typeof CREDIT_COSTS;
 
 /**

@@ -112,7 +112,7 @@ const PAGES: Record<string, InfoPage> = {
       {
         heading: "Kreditlər",
         paragraphs: [
-          "Hər yeni hesab 100 kredit alır. Tam sayt qurmaq 50, hər redaktə mesajı 2 kredit tələb edir. Önizləmə və geri qaytarma pulsuzdur.",
+          "Hər yeni hesab 100 kredit alır. Tam sayt qurmaq 85, hər redaktə mesajı 12 kredit tələb edir. Önizləmə və geri qaytarma pulsuzdur.",
         ],
       },
       {
