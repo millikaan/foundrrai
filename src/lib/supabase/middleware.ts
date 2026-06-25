@@ -10,8 +10,14 @@ export async function updateSession(request: NextRequest) {
 
   // OAuth / magic-link can land the `?code=` on the wrong path (e.g. the Supabase
   // Site URL root) — forward it to the callback so the session gets exchanged.
+  // API routes own their `?code=` (e.g. the Vercel integration callback), so never
+  // hijack those — otherwise the provider's code gets sent to the Supabase handler.
   const authCode = request.nextUrl.searchParams.get("code");
-  if (authCode && request.nextUrl.pathname !== "/auth/callback") {
+  if (
+    authCode &&
+    request.nextUrl.pathname !== "/auth/callback" &&
+    !request.nextUrl.pathname.startsWith("/api/")
+  ) {
     const callbackUrl = request.nextUrl.clone();
     callbackUrl.pathname = "/auth/callback";
     return NextResponse.redirect(callbackUrl);

@@ -12,8 +12,10 @@ import {
   Sparkles,
   User,
   X,
+  Zap,
 } from "lucide-react";
 
+import { CREDIT_PACKS, PLAN_SPECS, type PlanSpec } from "@/lib/stripe/plans";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +29,11 @@ interface SettingsModalProps {
   plan: string;
   credits: number;
   initialTab?: Tab;
+  /** Set after a fresh provider connect (e.g. "vercel") to show a success banner. */
+  justConnected?: string;
   onUpgraded: (plan: string, credits: number) => void;
+  /** Plan/credit change that should NOT trigger the celebratory upgrade tour. */
+  onPlanChanged?: (plan: string, credits: number) => void;
   onSignOut: () => void;
 }
 
@@ -52,7 +58,9 @@ export function SettingsModal({
   plan,
   credits,
   initialTab = "account",
+  justConnected,
   onUpgraded,
+  onPlanChanged,
   onSignOut,
 }: SettingsModalProps) {
   const [tab, setTab] = React.useState<Tab>(initialTab);
@@ -60,6 +68,8 @@ export function SettingsModal({
   const [savingName, setSavingName] = React.useState(false);
   const [nameSaved, setNameSaved] = React.useState(false);
   const [upgrading, setUpgrading] = React.useState<string | null>(null);
+  const [buyingPack, setBuyingPack] = React.useState<string | null>(null);
+  const [cancelling, setCancelling] = React.useState(false);
 
   React.useEffect(() => {
     if (open) setTab(initialTab);
@@ -110,6 +120,36 @@ export function SettingsModal({
       if (res.ok && data.simulated) onUpgraded(data.plan, data.credits);
     } finally {
       setUpgrading(null);
+    }
+  };
+
+  const buyCredits = async (pack: string) => {
+    setBuyingPack(pack);
+    try {
+      const res = await fetch("/api/checkout/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pack }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (res.ok && data.simulated) onPlanChanged?.(plan, data.credits);
+    } finally {
+      setBuyingPack(null);
+    }
+  };
+
+  const cancelPlan = async () => {
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/billing/cancel", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) onPlanChanged?.(data.plan, data.credits);
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -211,10 +251,19 @@ export function SettingsModal({
           ) : null}
 
           {tab === "plan" ? (
-            <PlanTab plan={plan} credits={credits} upgrading={upgrading} onUpgrade={upgrade} />
+            <PlanTab
+              plan={plan}
+              credits={credits}
+              upgrading={upgrading}
+              buyingPack={buyingPack}
+              cancelling={cancelling}
+              onUpgrade={upgrade}
+              onBuyCredits={buyCredits}
+              onCancel={cancelPlan}
+            />
           ) : null}
 
-          {tab === "connections" ? <ConnectionsTab /> : null}
+          {tab === "connections" ? <ConnectionsTab justConnected={justConnected} /> : null}
 
           {tab === "privacy" ? (
             <div className="max-w-[460px]">
@@ -243,121 +292,241 @@ export function SettingsModal({
   );
 }
 
+const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, max: 2 };
+
 function PlanTab({
   plan,
   credits,
   upgrading,
+  buyingPack,
+  cancelling,
   onUpgrade,
+  onBuyCredits,
+  onCancel,
 }: {
   plan: string;
   credits: number;
   upgrading: string | null;
+  buyingPack: string | null;
+  cancelling: boolean;
   onUpgrade: (target: "pro" | "max") => void;
+  onBuyCredits: (pack: string) => void;
+  onCancel: () => void;
 }) {
-  const showPro = plan === "free";
-  const showMax = plan !== "max";
+  const [confirmCancel, setConfirmCancel] = React.useState(false);
+  const currentRank = PLAN_RANK[plan] ?? 0;
 
   return (
-    <div className="max-w-[520px]">
+    <div className="max-w-[600px]">
       <h2 className="text-[20px] font-semibold tracking-tight">Plan və kredit</h2>
       <p className="mt-1 text-[14px] text-muted-foreground">
-        Cari planın və kredit balansın.
+        Planını idarə et və kredit balansını izlə.
       </p>
 
-      <div className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-muted/30 p-5">
+      {/* current plan + credit balance */}
+      <div className="mt-6 flex items-center justify-between overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.08] to-card p-5">
         <div>
-          <p className="text-[13px] text-muted-foreground">Cari plan</p>
-          <p className="mt-1 text-[18px] font-semibold">{PLAN_LABEL[plan] ?? plan}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Cari plan
+          </p>
+          <p className="mt-1 flex items-center gap-2 text-[20px] font-semibold">
+            {PLAN_LABEL[plan] ?? plan}
+            {plan !== "free" ? (
+              <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-medium text-primary">
+                aktiv
+              </span>
+            ) : null}
+          </p>
         </div>
         <div className="text-right">
-          <p className="text-[13px] text-muted-foreground">Kredit</p>
-          <p className="mt-1 font-mono text-[18px] font-semibold tabular-nums">{credits}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Kredit
+          </p>
+          <p className="mt-1 font-mono text-[22px] font-semibold tabular-nums">{credits}</p>
         </div>
       </div>
 
-      {showPro || showMax ? (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {showPro ? (
-            <PlanUpgradeCard
-              name="Pro"
-              price="29.99 ₼/ay"
-              perk="+500 kredit / ay"
-              loading={upgrading === "pro"}
-              onClick={() => onUpgrade("pro")}
-            />
-          ) : null}
-          {showMax ? (
-            <PlanUpgradeCard
-              name="Max"
-              price="99.99 ₼/ay"
-              perk="+1200 kredit / ay"
-              loading={upgrading === "max"}
-              onClick={() => onUpgrade("max")}
-              featured
-            />
-          ) : null}
+      {/* plan specs */}
+      <p className="mt-7 text-[13px] font-medium text-muted-foreground">Planları müqayisə et</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        {PLAN_SPECS.map((spec) => (
+          <PlanSpecCard
+            key={spec.id}
+            spec={spec}
+            current={spec.id === plan}
+            upgrade={(PLAN_RANK[spec.id] ?? 0) > currentRank}
+            loading={upgrading === spec.id}
+            onUpgrade={() => spec.id !== "free" && onUpgrade(spec.id)}
+          />
+        ))}
+      </div>
+
+      {/* Pro-only: buy more credits */}
+      {plan === "pro" ? (
+        <div className="mt-7">
+          <div className="flex items-center gap-2">
+            <Zap className="h-4 w-4 text-primary" />
+            <h3 className="text-[15px] font-semibold">Əlavə kredit al</h3>
+          </div>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Krediti bitəndə anında doldur — bu paketlər yalnız Pro üçündür.
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {CREDIT_PACKS.map((pack) => (
+              <CreditPackCard
+                key={pack.id}
+                pack={pack}
+                loading={buyingPack === pack.id}
+                onBuy={() => onBuyCredits(pack.id)}
+              />
+            ))}
+          </div>
         </div>
-      ) : (
-        <p className="mt-6 inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-[14px]">
-          <Check className="h-4 w-4 text-primary" />
-          Ən yüksək plandasan.
-        </p>
-      )}
+      ) : null}
+
+      {/* cancel (paid plans only) */}
+      {plan !== "free" ? (
+        <div className="mt-7 flex flex-col gap-3 rounded-2xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[14px] font-medium">Planı ləğv et</p>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              Pulsuz plana keç. Qalan kreditlərin saxlanılır.
+            </p>
+          </div>
+          {confirmCancel ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onCancel}
+                disabled={cancelling}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-red-600 px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+              >
+                {cancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Bəli, ləğv et
+              </button>
+              <button
+                onClick={() => setConfirmCancel(false)}
+                disabled={cancelling}
+                className="inline-flex h-9 items-center rounded-lg border border-border px-3.5 text-[13px] font-medium transition-colors hover:bg-muted disabled:opacity-50"
+              >
+                Geri
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmCancel(true)}
+              className="inline-flex h-9 shrink-0 items-center rounded-lg border border-border px-3.5 text-[13px] font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              Planı ləğv et
+            </button>
+          )}
+        </div>
+      ) : null}
 
       <p className="mt-4 text-[12px] text-muted-foreground">
-        Qeyd: hazırda yüksəltmə ödənişsiz simulyasiyadır — kredit dərhal əlavə olunur.
+        Qeyd: Stripe hələ konfiqurasiya olunmayıbsa, yüksəltmə pulsuz simulyasiyadır —
+        kredit dərhal əlavə olunur.
       </p>
     </div>
   );
 }
 
-function PlanUpgradeCard({
-  name,
-  price,
-  perk,
+function PlanSpecCard({
+  spec,
+  current,
+  upgrade,
   loading,
-  onClick,
-  featured,
+  onUpgrade,
 }: {
-  name: string;
-  price: string;
-  perk: string;
+  spec: PlanSpec;
+  current: boolean;
+  upgrade: boolean;
   loading: boolean;
-  onClick: () => void;
-  featured?: boolean;
+  onUpgrade: () => void;
 }) {
   return (
     <div
       className={cn(
-        "flex flex-col rounded-2xl border p-5",
-        featured ? "border-primary/60 bg-primary/[0.03]" : "border-border",
+        "flex flex-col rounded-2xl border p-4",
+        current ? "border-primary/60 bg-primary/[0.04]" : "border-border",
       )}
     >
-      <p className="text-[15px] font-semibold">{name}</p>
-      <p className="mt-1 text-[13px] text-muted-foreground">{price}</p>
-      <p className="mt-3 flex items-center gap-1.5 text-[13px] text-foreground/80">
-        <Sparkles className="h-3.5 w-3.5 text-primary" />
-        {perk}
+      <div className="flex items-center justify-between">
+        <p className="text-[14px] font-semibold">{spec.name}</p>
+        {current ? (
+          <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[10px] font-medium text-primary">
+            Cari
+          </span>
+        ) : null}
+      </div>
+      <p className="mt-1 text-[13px] text-muted-foreground">
+        <span className="text-[17px] font-semibold text-foreground">{spec.price}</span>
+        {spec.period}
       </p>
+      <ul className="mt-3 flex flex-1 flex-col gap-2">
+        {spec.features.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-[12.5px] text-foreground/80">
+            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={3} />
+            {f}
+          </li>
+        ))}
+      </ul>
+      {upgrade ? (
+        <button
+          onClick={onUpgrade}
+          disabled={loading}
+          className="mt-4 inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-foreground text-[13px] font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+          {spec.name}-a keç
+        </button>
+      ) : current ? (
+        <p className="mt-4 inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-muted/60 text-[13px] font-medium text-muted-foreground">
+          <Check className="h-3.5 w-3.5" /> Aktiv plan
+        </p>
+      ) : (
+        <p className="mt-4 inline-flex h-9 items-center justify-center rounded-lg text-[12px] text-muted-foreground/55">
+          Daha aşağı plan
+        </p>
+      )}
+    </div>
+  );
+}
+
+function CreditPackCard({
+  pack,
+  loading,
+  onBuy,
+}: {
+  pack: { id: string; credits: number; amount: number; name: string };
+  loading: boolean;
+  onBuy: () => void;
+}) {
+  const price = `${(pack.amount / 100).toFixed(2)} ₼`;
+  return (
+    <div className="flex flex-col items-start rounded-2xl border border-border p-4">
+      <p className="font-mono text-[18px] font-semibold tabular-nums">+{pack.credits}</p>
+      <p className="text-[12px] text-muted-foreground">kredit</p>
       <button
-        onClick={onClick}
+        onClick={onBuy}
         disabled={loading}
-        className={cn(
-          "mt-4 inline-flex h-10 items-center justify-center gap-1.5 rounded-xl text-[14px] font-medium transition-all disabled:opacity-50",
-          featured
-            ? "bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))]"
-            : "bg-foreground text-background hover:bg-foreground/90",
-        )}
+        className="mt-3 inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-primary text-[13px] font-medium text-primary-foreground transition-colors hover:bg-[hsl(var(--primary-hover))] disabled:opacity-50"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-        {name}-a keç
+        {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+        {price}
       </button>
     </div>
   );
 }
 
-function ConnectionsTab() {
-  const [connected, setConnected] = React.useState<Record<string, boolean>>({});
+const PROVIDER_LABEL: Record<string, string> = {
+  vercel: "Vercel",
+  supabase: "Supabase",
+};
+
+function ConnectionsTab({ justConnected }: { justConnected?: string }) {
+  const [connected, setConnected] = React.useState<Record<string, boolean>>(
+    justConnected ? { [justConnected]: true } : {},
+  );
   const [vercel, setVercel] = React.useState("");
   const [supaRef, setSupaRef] = React.useState("");
   const [supaToken, setSupaToken] = React.useState("");
@@ -403,6 +572,25 @@ function ConnectionsTab() {
       <p className="mt-1 text-[14px] text-muted-foreground">
         Saytını öz hesabına yayımlamaq üçün hesablarını qoş. Açarlar şifrələnir.
       </p>
+
+      {justConnected ? (
+        <div
+          className="mt-5 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.07] p-4"
+          style={{ animation: "connected-pop 0.4s ease-out" }}
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+            <Check className="h-5 w-5" strokeWidth={3} />
+          </span>
+          <div>
+            <p className="text-[14px] font-semibold text-emerald-700">
+              {PROVIDER_LABEL[justConnected] ?? justConnected} qoşuldu!
+            </p>
+            <p className="text-[12.5px] text-emerald-700/75">
+              Artıq saytını birbaşa öz hesabına yayımlaya bilərsən.
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-6 rounded-2xl border border-border p-5">
         <div className="flex items-center justify-between">

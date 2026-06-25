@@ -34,6 +34,7 @@ export function ProfileMenu({
   const [settingsTab, setSettingsTab] = React.useState<
     "account" | "plan" | "connections"
   >("account");
+  const [justConnected, setJustConnected] = React.useState<string | undefined>();
   const [tour, setTour] = React.useState<{ plan: string; granted: number } | null>(null);
 
   const [plan_, setPlan] = React.useState(plan);
@@ -50,9 +51,12 @@ export function ProfileMenu({
 
   React.useEffect(() => {
     if (!onDashboard) return;
-    const tab = new URLSearchParams(window.location.search).get("settings");
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("settings");
+    const connected = params.get("connected") ?? undefined;
     if (tab === "account" || tab === "plan" || tab === "connections") {
       setSettingsTab(tab);
+      if (connected) setJustConnected(connected);
       setSettingsOpen(true);
       window.history.replaceState(null, "", "/workspace");
     }
@@ -75,6 +79,13 @@ export function ProfileMenu({
     setCredits(newCredits);
     setSettingsOpen(false);
     setTour({ plan: newPlan, granted });
+    router.refresh();
+  };
+
+  // Plan/credit change without the celebratory tour (cancel, credit top-up).
+  const onPlanChanged = (newPlan: string, newCredits: number) => {
+    setPlan(newPlan);
+    setCredits(newCredits);
     router.refresh();
   };
 
@@ -166,13 +177,18 @@ export function ProfileMenu({
 
       <SettingsModal
         open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
+        onClose={() => {
+          setSettingsOpen(false);
+          setJustConnected(undefined);
+        }}
         name={name}
         email={email}
         plan={plan_}
         credits={credits}
         initialTab={settingsTab}
+        justConnected={justConnected}
         onUpgraded={onUpgraded}
+        onPlanChanged={onPlanChanged}
         onSignOut={signOut}
       />
 

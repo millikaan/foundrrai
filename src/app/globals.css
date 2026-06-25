@@ -252,6 +252,20 @@
   }
 }
 
+@keyframes connected-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  60% {
+    transform: translateY(0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .bloom-hero {
   transform-origin: 50% 28%;
   will-change: opacity, transform, filter;

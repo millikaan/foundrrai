@@ -35,14 +35,29 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as {
-      metadata?: { userId?: string; plan?: string };
+      metadata?: { userId?: string; plan?: string; type?: string; credits?: string };
     };
     const userId = session.metadata?.userId;
+    const type = session.metadata?.type;
     const plan = session.metadata?.plan;
 
-    if (userId && isPaidPlan(plan)) {
-      try {
-        const admin = createAdminClient();
+    try {
+      const admin = createAdminClient();
+
+      if (userId && type === "credits") {
+        // One-time credit top-up: add credits, keep the plan.
+        const add = Number.parseInt(session.metadata?.credits ?? "0", 10);
+        if (add > 0) {
+          const { data: profile } = await admin
+            .from("profiles")
+            .select("credits")
+            .eq("id", userId)
+            .single();
+          const credits = (profile?.credits ?? 0) + add;
+          await admin.from("profiles").update({ credits }).eq("id", userId);
+        }
+      } else if (userId && isPaidPlan(plan)) {
+        // Subscription upgrade: grant the plan + its monthly credits.
         const { data: profile } = await admin
           .from("profiles")
           .select("credits")
@@ -50,6 +65,20 @@ export async function POST(request: Request) {
           .single();
         const credits = (profile?.credits ?? 0) + PLAN_CONFIG[plan].credits;
         await admin.from("profiles").update({ plan, credits }).eq("id", userId);
+      }
+    } catch {
+      return NextResponse.json({ error: "Profil yenilənmədi." }, { status: 500 });
+    }
+  }
+
+  // A subscription ending (cancellation, payment failure) → drop to Free.
+  if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object as { metadata?: { userId?: string } };
+    const userId = sub.metadata?.userId;
+    if (userId) {
+      try {
+        const admin = createAdminClient();
+        await admin.from("profiles").update({ plan: "free" }).eq("id", userId);
       } catch {
         return NextResponse.json({ error: "Profil yenilənmədi." }, { status: 500 });
       }
