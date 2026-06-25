@@ -21,6 +21,13 @@ export default async function WorkspacePage() {
     .eq("id", user.id)
     .single();
 
+  const { data: sites } = await supabase
+    .from("sites")
+    .select("id, name, prompt, status, updated_at")
+    .eq("owner_id", user.id)
+    .order("updated_at", { ascending: false })
+    .limit(50);
+
   const name =
     profile?.name?.trim() || user.email?.split("@")[0] || "dostum";
 
@@ -30,6 +37,7 @@ export default async function WorkspacePage() {
       email={user.email ?? ""}
       credits={profile?.credits ?? 0}
       plan={profile?.plan ?? "free"}
+      sites={sites ?? []}
     />
   );
 }

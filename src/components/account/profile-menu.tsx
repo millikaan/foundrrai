@@ -35,6 +35,7 @@ export function ProfileMenu({
     "account" | "plan" | "connections"
   >("account");
   const [justConnected, setJustConnected] = React.useState<string | undefined>();
+  const [connectError, setConnectError] = React.useState<string | undefined>();
   const [tour, setTour] = React.useState<{ plan: string; granted: number } | null>(null);
 
   const [plan_, setPlan] = React.useState(plan);
@@ -54,11 +55,13 @@ export function ProfileMenu({
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("settings");
     const connected = params.get("connected") ?? undefined;
+    const connectErr = params.get("connect") === "vercel_error" ? (params.get("reason") ?? "unknown") : undefined;
     const upgraded = params.get("upgraded");
 
     if (tab === "account" || tab === "plan" || tab === "connections") {
       setSettingsTab(tab);
       if (connected) setJustConnected(connected);
+      if (connectErr) setConnectError(connectErr);
       setSettingsOpen(true);
       window.history.replaceState(null, "", "/workspace");
     }
@@ -194,6 +197,7 @@ export function ProfileMenu({
         onClose={() => {
           setSettingsOpen(false);
           setJustConnected(undefined);
+          setConnectError(undefined);
         }}
         name={name}
         email={email}
@@ -201,6 +205,7 @@ export function ProfileMenu({
         credits={credits}
         initialTab={settingsTab}
         justConnected={justConnected}
+        connectError={connectError}
         onUpgraded={onUpgraded}
         onPlanChanged={onPlanChanged}
         onSignOut={signOut}

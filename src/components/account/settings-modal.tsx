@@ -32,6 +32,8 @@ interface SettingsModalProps {
   initialTab?: Tab;
   /** Set after a fresh provider connect (e.g. "vercel") to show a success banner. */
   justConnected?: string;
+  /** Set when a provider connect failed — a reason code shown as an error banner. */
+  connectError?: string;
   onUpgraded: (plan: string, credits: number) => void;
   /** Plan/credit change that should NOT trigger the celebratory upgrade tour. */
   onPlanChanged?: (plan: string, credits: number) => void;
@@ -60,6 +62,7 @@ export function SettingsModal({
   credits,
   initialTab = "account",
   justConnected,
+  connectError,
   onUpgraded,
   onPlanChanged,
   onSignOut,
@@ -282,7 +285,9 @@ export function SettingsModal({
             />
           ) : null}
 
-          {tab === "connections" ? <ConnectionsTab justConnected={justConnected} /> : null}
+          {tab === "connections" ? (
+            <ConnectionsTab justConnected={justConnected} connectError={connectError} />
+          ) : null}
 
           {tab === "privacy" ? (
             <div className="max-w-[460px]">
@@ -559,7 +564,24 @@ const PROVIDER_LABEL: Record<string, string> = {
   supabase: "Supabase",
 };
 
-function ConnectionsTab({ justConnected }: { justConnected?: string }) {
+const CONNECT_ERROR_MESSAGE: Record<string, string> = {
+  config:
+    "Vercel inteqrasiyası tam qurulmayıb — server açarları (FOUNDRR_VERCEL_CLIENT_ID/SECRET) təyin edilməyib.",
+  token:
+    "Vercel token mübadiləsi alınmadı. Çox güman ki, inteqrasiyanın Redirect URL-i bu domenlə uyğun gəlmir.",
+  no_code: "Vercel kodu gəlmədi. Yenidən cəhd et.",
+  encrypt: "Şifrələmə açarı konfiqurasiya olunmayıb.",
+  save: "Bağlantı bazaya yazılmadı.",
+  unknown: "Vercel qoşulmadı. Yenidən cəhd et.",
+};
+
+function ConnectionsTab({
+  justConnected,
+  connectError,
+}: {
+  justConnected?: string;
+  connectError?: string;
+}) {
   const [connected, setConnected] = React.useState<Record<string, boolean>>(
     justConnected ? { [justConnected]: true } : {},
   );
@@ -608,6 +630,20 @@ function ConnectionsTab({ justConnected }: { justConnected?: string }) {
       <p className="mt-1 text-[14px] text-muted-foreground">
         Saytını öz hesabına yayımlamaq üçün hesablarını qoş. Açarlar şifrələnir.
       </p>
+
+      {connectError ? (
+        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-4">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-600">
+            <X className="h-4 w-4" strokeWidth={3} />
+          </span>
+          <div>
+            <p className="text-[14px] font-semibold text-red-700">Vercel qoşulmadı</p>
+            <p className="text-[12.5px] text-red-700/80">
+              {CONNECT_ERROR_MESSAGE[connectError] ?? CONNECT_ERROR_MESSAGE.unknown}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {justConnected ? (
         <div

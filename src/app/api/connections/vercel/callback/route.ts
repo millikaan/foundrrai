@@ -15,11 +15,18 @@ export async function GET(request: Request) {
   const teamId = searchParams.get("teamId");
   const configurationId = searchParams.get("configurationId");
 
+  // Always send failures to the Connections tab WITH a reason so the user (and we)
+  // can see why it failed instead of it silently doing nothing.
+  const fail = (reason: string) =>
+    NextResponse.redirect(
+      `${origin}/workspace?settings=connections&connect=vercel_error&reason=${reason}`,
+    );
+
+  if (!code) return fail("no_code");
+
   const clientId = process.env.FOUNDRR_VERCEL_CLIENT_ID;
   const clientSecret = process.env.FOUNDRR_VERCEL_CLIENT_SECRET;
-  if (!code || !clientId || !clientSecret) {
-    return NextResponse.redirect(`${origin}/workspace?connect=vercel_error`);
-  }
+  if (!clientId || !clientSecret) return fail("config");
 
   const supabase = await createClient();
   const {
@@ -50,14 +57,19 @@ export async function GET(request: Request) {
     accessToken = null;
   }
 
-  if (!accessToken) {
-    return NextResponse.redirect(`${origin}/workspace?connect=vercel_error`);
+  if (!accessToken) return fail("token");
+
+  let token_encrypted: string;
+  try {
+    token_encrypted = encryptToken(accessToken);
+  } catch {
+    return fail("encrypt");
   }
 
   const row = {
     owner_id: user.id,
     provider: "vercel",
-    token_encrypted: encryptToken(accessToken),
+    token_encrypted,
     meta: { teamId: team, configurationId },
   };
   const { data: existing } = await supabase
@@ -66,11 +78,10 @@ export async function GET(request: Request) {
     .eq("owner_id", user.id)
     .eq("provider", "vercel")
     .maybeSingle();
-  if (existing) {
-    await supabase.from("connections").update(row).eq("id", existing.id);
-  } else {
-    await supabase.from("connections").insert(row);
-  }
+  const result = existing
+    ? await supabase.from("connections").update(row).eq("id", existing.id)
+    : await supabase.from("connections").insert(row);
+  if (result.error) return fail("save");
 
   return NextResponse.redirect(`${origin}/workspace?settings=connections&connected=vercel`);
 }

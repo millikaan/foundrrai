@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUp, Plus } from "lucide-react";
+import { ArrowUp, LayoutGrid, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/account/profile-menu";
@@ -27,14 +28,29 @@ function greetingFor(name: string): string {
   return name ? `${phrase}, ${name}` : phrase;
 }
 
+interface SiteSummary {
+  id: string;
+  name: string | null;
+  prompt: string | null;
+  status: string | null;
+  updated_at: string | null;
+}
+
 interface WorkspaceShellProps {
   name: string;
   email: string;
   credits: number;
   plan: string;
+  sites: SiteSummary[];
 }
 
-export function WorkspaceShell({ name, email, credits, plan }: WorkspaceShellProps) {
+const STATUS_LABEL: Record<string, string> = {
+  built: "Hazır",
+  draft: "Qaralama",
+  deployed: "Yayımlandı",
+};
+
+export function WorkspaceShell({ name, email, credits, plan, sites }: WorkspaceShellProps) {
   const router = useRouter();
   const [value, setValue] = React.useState("");
   const [greeting, setGreeting] = React.useState(`Vaxtdır, ${name}`);
@@ -75,16 +91,41 @@ export function WorkspaceShell({ name, email, credits, plan }: WorkspaceShellPro
           Yeni sayt
         </Button>
 
-        <div className="mt-6 px-2">
+        <div className="mt-6 flex min-h-0 flex-1 flex-col px-2">
           <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
             Saytlarım
           </p>
-          <p className="mt-3 text-[13px] text-muted-foreground">
-            Hələ saytın yoxdur. Bir cümlə yazıb ilkini qur.
-          </p>
+          {sites.length === 0 ? (
+            <p className="mt-3 text-[13px] text-muted-foreground">
+              Hələ saytın yoxdur. Bir cümlə yazıb ilkini qur.
+            </p>
+          ) : (
+            <ul className="mt-3 -mx-1 flex-1 space-y-0.5 overflow-y-auto pr-0.5">
+              {sites.map((site) => (
+                <li key={site.id}>
+                  <Link
+                    href={`/workspace/build?site=${site.id}`}
+                    className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-muted"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover:bg-card">
+                      <LayoutGrid className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-medium text-foreground">
+                        {site.prompt || site.name || "Adsız sayt"}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {(site.status && STATUS_LABEL[site.status]) || site.status || "—"}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <div className="mt-auto flex flex-col gap-3">
+        <div className="mt-4 flex flex-col gap-3">
           <div className="rounded-xl border border-border bg-card p-3">
             <div className="flex items-center justify-between">
               <span className="text-[13px] text-muted-foreground">Kredit</span>
