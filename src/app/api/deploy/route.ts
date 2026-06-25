@@ -8,6 +8,41 @@ export const maxDuration = 120;
 
 interface DeployBody {
   siteId?: string;
+  title?: string;
+  description?: string;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Inject SEO title + description into the site's index.html before deploying. */
+function applySeo(
+  files: Array<{ file: string; data: string }>,
+  title?: string,
+  description?: string,
+): void {
+  if (!title && !description) return;
+  const idx = files.find((f) => f.file === "index.html");
+  if (!idx) return;
+  let html = idx.data;
+  if (title) {
+    const t = `<title>${escapeHtml(title)}</title>`;
+    html = /<title>[\s\S]*?<\/title>/i.test(html)
+      ? html.replace(/<title>[\s\S]*?<\/title>/i, t)
+      : html.replace(/<head>/i, `<head>\n    ${t}`);
+  }
+  if (description) {
+    const m = `<meta name="description" content="${escapeHtml(description)}" />`;
+    html = /<meta\s+name=["']description["'][^>]*>/i.test(html)
+      ? html.replace(/<meta\s+name=["']description["'][^>]*>/i, m)
+      : html.replace(/<head>/i, `<head>\n    ${m}`);
+  }
+  idx.data = html;
 }
 
 /** Schema created on the user's own Supabase so generated forms can store leads. */
@@ -72,6 +107,9 @@ export async function POST(request: Request) {
   if (files.length === 0) {
     return NextResponse.json({ error: "Sayt faylları tapılmadı." }, { status: 400 });
   }
+
+  // Apply the user's SEO title/description to index.html before deploying.
+  applySeo(files, body.title?.trim(), body.description?.trim());
 
   const vercel = await getConnection(supabase, user.id, "vercel");
   if (!vercel) {

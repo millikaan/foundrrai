@@ -1,178 +1,67 @@
-import {
-  ShoppingCart,
-  Search,
-  Menu,
-  Heart,
-  Truck,
-  RotateCcw,
-  ShieldCheck,
-  Headphones,
-  Star,
-  ArrowRight,
-  AtSign,
-  MessageCircle,
-  Send,
-  Sparkles,
-} from "lucide-react";
-
-const products = [
-  { name: "İpək Bluz", category: "Qadın geyimi", price: 64, oldPrice: 92, tag: "Yeni" },
-  { name: "Yüksək Bel Cins", category: "Qadın geyimi", price: 79, oldPrice: 110, tag: "Çox satılan" },
-  { name: "Oversize Trençkot", category: "Üst geyim", price: 145, oldPrice: 199, tag: "Endirim" },
-  { name: "Kaşmir Sviter", category: "Trikotaj", price: 98, oldPrice: 130, tag: null },
-  { name: "Dəri Çiyin Çantası", category: "Aksesuar", price: 120, oldPrice: 165, tag: "Yeni" },
-  { name: "Minimal Qol Saatı", category: "Aksesuar", price: 210, oldPrice: null, tag: "Premium" },
-  { name: "Klassik Loafer", category: "Ayaqqabı", price: 135, oldPrice: 180, tag: "Endirim" },
-  { name: "İpək Şarf", category: "Aksesuar", price: 42, oldPrice: 58, tag: null },
-];
-
-const swatches = [
-  "from-violet-200 to-indigo-300",
-  "from-indigo-200 to-blue-300",
-  "from-fuchsia-200 to-violet-300",
-  "from-sky-200 to-indigo-300",
-  "from-rose-200 to-fuchsia-300",
-  "from-violet-300 to-indigo-400",
-  "from-indigo-200 to-violet-300",
-  "from-purple-200 to-indigo-300",
-];
-
-const categories = [
-  { name: "Qadın geyimi", count: "240 məhsul", grad: "from-violet-500 to-indigo-600" },
-  { name: "Kişi geyimi", count: "180 məhsul", grad: "from-indigo-500 to-blue-600" },
-  { name: "Aksesuarlar", count: "120 məhsul", grad: "from-fuchsia-500 to-violet-600" },
-  { name: "Ayaqqabı", count: "95 məhsul", grad: "from-purple-500 to-indigo-600" },
-];
-
-const perks = [
-  { icon: Truck, title: "Pulsuz çatdırılma", desc: "70 ₼-dən yuxarı bütün sifarişlər üçün Bakı daxili pulsuz." },
-  { icon: RotateCcw, title: "14 gün qaytarma", desc: "Bəyənmədiniz? Heç bir sual vermədən geri qaytarın." },
-  { icon: ShieldCheck, title: "Təhlükəsiz ödəniş", desc: "Kart məlumatlarınız 256-bit şifrələmə ilə qorunur." },
-  { icon: Headphones, title: "Daimi dəstək", desc: "Hər gün 09:00–21:00 arası canlı dəstək xidməti." },
-];
+import { Phone, Mail, MapPin, Star, Check, ArrowRight, ArrowUpRight, Menu, Truck, Shield, Sparkles, Quote, Send, ShoppingBag, Heart } from "lucide-react";
 
 export function StoreSite() {
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
-      {/* Promo banner */}
-      <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-4 py-2.5 text-center text-sm font-medium text-white">
-        <span className="inline-flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
-          Endirim 30% — yeni kolleksiya başladı. Kod:{" "}
-          <span className="rounded bg-white/20 px-1.5 py-0.5 font-bold tracking-wide">AYLA30</span>
-        </span>
-      </div>
-
-      {/* Nav */}
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-base font-black text-white">
-              A
+    <div className="min-h-screen bg-[#faf9f7] font-sans text-neutral-900 antialiased">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-neutral-200/70 bg-[#faf9f7]/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 text-[#faf9f7]">
+              <ShoppingBag className="h-4 w-4" strokeWidth={1.75} />
             </div>
-            <span className="text-xl font-extrabold tracking-tight">
-              Ayla<span className="text-indigo-600">Store</span>
-            </span>
+            <span className="text-lg font-semibold tracking-tight">Ayla Store</span>
           </div>
-
-          <ul className="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex">
-            <li><a href="#mehsullar" className="transition hover:text-indigo-600">Məhsullar</a></li>
-            <li><a href="#kateqoriyalar" className="transition hover:text-indigo-600">Kateqoriyalar</a></li>
-            <li><a href="#ustunlukler" className="transition hover:text-indigo-600">Üstünlüklər</a></li>
-            <li><a href="#abune" className="transition hover:text-indigo-600">Endirimlər</a></li>
-          </ul>
-
-          <div className="flex items-center gap-2">
-            <button type="button" className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 sm:flex" aria-label="Axtar">
-              <Search className="h-5 w-5" />
-            </button>
-            <button type="button" className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 sm:flex" aria-label="Sevimlilər">
-              <Heart className="h-5 w-5" />
-            </button>
-            <button type="button" className="relative flex h-10 items-center gap-2 rounded-full bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-700" aria-label="Səbət">
-              <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Səbət</span>
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-fuchsia-500 text-[10px] font-bold text-white">3</span>
-            </button>
-            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 lg:hidden" aria-label="Menyu">
-              <Menu className="h-5 w-5" />
+          <nav className="hidden items-center gap-9 text-sm text-neutral-600 md:flex">
+            <a href="#kateqoriya" className="transition-colors hover:text-neutral-900">Kateqoriyalar</a>
+            <a href="#mehsullar" className="transition-colors hover:text-neutral-900">Məhsullar</a>
+            <a href="#haqqimizda" className="transition-colors hover:text-neutral-900">Haqqımızda</a>
+            <a href="#elaqe" className="transition-colors hover:text-neutral-900">Əlaqə</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <a href="#mehsullar" className="hidden items-center gap-2 rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-[#faf9f7] transition-colors hover:bg-neutral-800 sm:inline-flex">
+              Alış-veriş
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            </a>
+            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-700 md:hidden">
+              <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
           </div>
-        </nav>
+        </div>
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50 via-white to-white">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-gradient-to-br from-violet-200 to-indigo-200 opacity-60 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-gradient-to-br from-fuchsia-200 to-violet-200 opacity-50 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-xs font-semibold text-indigo-700">
-              <Sparkles className="h-3.5 w-3.5" />
-              Yaz–Yay 2026 kolleksiyası
-            </span>
-            <h1 className="mt-6 text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-              Üslubunu{" "}
-              <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">
-                yenidən kəşf et
-              </span>
-            </h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-slate-600">
-              Bakının ən seçilmiş onlayn butiki. Premium parçalar, müasir dizayn və hər
-              gün sənin üçün yenilənən kolleksiya — hamısı bir yerdə.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <button type="button" className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700">
-                Alış-verişə başla
-                <ArrowRight className="h-4 w-4" />
-              </button>
-              <button type="button" className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:text-indigo-600">
-                Kolleksiyaya bax
-              </button>
-            </div>
-            <div className="mt-10 flex items-center gap-8">
-              <div>
-                <p className="text-2xl font-black text-slate-900">12k+</p>
-                <p className="text-sm text-slate-500">Məmnun müştəri</p>
-              </div>
-              <div className="h-10 w-px bg-slate-200" />
-              <div>
-                <p className="text-2xl font-black text-slate-900">630+</p>
-                <p className="text-sm text-slate-500">Aktiv məhsul</p>
-              </div>
-              <div className="h-10 w-px bg-slate-200" />
-              <div>
-                <div className="flex items-center gap-1 text-amber-400">
-                  <Star className="h-4 w-4 fill-current" />
-                  <span className="text-2xl font-black text-slate-900">4.9</span>
-                </div>
-                <p className="text-sm text-slate-500">Orta reytinq</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="aspect-[3/4] rounded-3xl bg-gradient-to-br from-violet-400 to-indigo-500 p-6 shadow-xl shadow-indigo-200">
-                  <span className="rounded-full bg-white/25 px-3 py-1 text-xs font-bold text-white">Yeni</span>
-                  <p className="mt-28 text-lg font-bold text-white">İpək Kolleksiya</p>
-                  <p className="text-sm text-white/80">64 ₼-dən başlayır</p>
-                </div>
-                <div className="aspect-square rounded-3xl bg-gradient-to-br from-fuchsia-300 to-violet-400 p-6 shadow-lg">
-                  <p className="text-3xl font-black text-white">-30%</p>
-                  <p className="mt-1 text-sm font-medium text-white/90">bütün üst geyimə</p>
-                </div>
-              </div>
-              <div className="space-y-4 pt-10">
-                <div className="aspect-square rounded-3xl bg-gradient-to-br from-indigo-300 to-blue-400 p-6 shadow-lg">
-                  <p className="text-sm font-medium text-white/90">Aksesuarlar</p>
-                  <p className="mt-1 text-lg font-bold text-white">Stil tamamlayır</p>
-                </div>
-                <div className="aspect-[3/4] rounded-3xl bg-gradient-to-br from-slate-800 to-indigo-900 p-6 shadow-xl">
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">Premium</span>
-                  <p className="mt-28 text-lg font-bold text-white">Limitli seriya</p>
-                  <p className="text-sm text-white/70">Yalnız onlayn</p>
+      <section className="relative">
+        <div className="relative mx-auto max-w-7xl px-6 pt-6">
+          <div className="relative overflow-hidden rounded-[2rem]">
+            <img
+              src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80"
+              alt=""
+              className="h-[640px] w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
+            <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14 lg:px-20">
+              <div className="max-w-xl">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium tracking-wide text-white backdrop-blur-sm">
+                  <Sparkles className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  Yaz / Yay 2026 Kolleksiyası
+                </span>
+                <h1 className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                  Üslubun yeni
+                  <br />
+                  ünvanı.
+                </h1>
+                <p className="mt-6 max-w-md text-lg leading-relaxed text-white/80">
+                  Bakının mərkəzində seçilmiş geyim butiki. Müasir kəsimlər, keyfiyyətli parçalar və hər mövsümə uyğun zövqlü dizaynlar.
+                </p>
+                <div className="mt-9 flex flex-wrap items-center gap-4">
+                  <a href="#mehsullar" className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-neutral-900 transition-transform hover:-translate-y-0.5">
+                    Alış-verişə başla
+                    <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                  </a>
+                  <a href="#kateqoriya" className="inline-flex items-center gap-2 rounded-full border border-white/40 px-7 py-3.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
+                    Kolleksiyalar
+                  </a>
                 </div>
               </div>
             </div>
@@ -180,198 +69,325 @@ export function StoreSite() {
         </div>
       </section>
 
-      {/* Categories */}
-      <section id="kateqoriyalar" className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-8 flex items-end justify-between">
+      {/* Promo / sale strip */}
+      <section className="mx-auto max-w-7xl px-6 pt-5">
+        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 rounded-2xl border border-neutral-200 bg-white px-6 py-4 text-sm text-neutral-700">
+          <span className="flex items-center gap-2">
+            <Truck className="h-4 w-4 text-neutral-900" strokeWidth={1.75} />
+            100 ₼-dan yuxarı pulsuz çatdırılma
+          </span>
+          <span className="hidden h-4 w-px bg-neutral-200 sm:block" />
+          <span className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-neutral-900" strokeWidth={1.75} />
+            14 gün ərzində dəyişdirmə
+          </span>
+          <span className="hidden h-4 w-px bg-neutral-200 sm:block" />
+          <span className="flex items-center gap-2 font-medium text-neutral-900">
+            <Sparkles className="h-4 w-4" strokeWidth={1.75} />
+            Yeni kolleksiyaya <span className="rounded-full bg-neutral-900 px-2 py-0.5 text-xs text-white">-20%</span>
+          </span>
+        </div>
+      </section>
+
+      {/* Category tiles */}
+      <section id="kateqoriya" className="mx-auto max-w-7xl px-6 py-20">
+        <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-3xl font-black tracking-tight">Kateqoriyalar</h2>
-            <p className="mt-2 text-slate-500">Axtardığını sürətlə tap</p>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">Kateqoriyalar</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Nə axtarırsınız?</h2>
           </div>
-          <a href="#mehsullar" className="hidden items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 sm:flex">
-            Hamısına bax <ArrowRight className="h-4 w-4" />
+          <a href="#mehsullar" className="hidden items-center gap-1.5 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:inline-flex">
+            Hamısına bax
+            <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
           </a>
         </div>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {categories.map((c) => (
-            <button
-              key={c.name}
-              type="button"
-              className={`group relative overflow-hidden rounded-3xl bg-gradient-to-br ${c.grad} p-6 text-left shadow-lg transition hover:-translate-y-1`}
-            >
-              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/15" />
-              <p className="relative text-lg font-bold text-white">{c.name}</p>
-              <p className="relative mt-1 text-sm text-white/80">{c.count}</p>
-              <span className="relative mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white">
-                Kəşf et <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </span>
-            </button>
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { name: "Qadın geyimi", count: "120+ məhsul", img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80" },
+            { name: "Mağaza seçimi", count: "Yeni gələnlər", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+            { name: "Aksesuarlar", count: "80+ məhsul", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" },
+          ].map((c) => (
+            <a key={c.name} href="#mehsullar" className="group relative overflow-hidden rounded-2xl border border-neutral-200">
+              <img src={c.img} alt="" className="h-72 w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-white">{c.name}</h3>
+                  <p className="mt-1 text-sm text-white/75">{c.count}</p>
+                </div>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-neutral-900 transition-transform group-hover:translate-x-0.5">
+                  <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+                </span>
+              </div>
+            </a>
           ))}
         </div>
       </section>
 
-      {/* Products */}
-      <section id="mehsullar" className="mx-auto max-w-7xl px-5 pb-16">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight">Ən çox satılanlar</h2>
-            <p className="mt-2 text-slate-500">Bu həftə hər kəsin sevdiyi məhsullar</p>
+      {/* Featured products */}
+      <section id="mehsullar" className="border-y border-neutral-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">Seçilmişlər</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Populyar məhsullar</h2>
+            </div>
+            <a href="#elaqe" className="hidden items-center gap-1.5 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:inline-flex">
+              Bütün katalog
+              <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
+            </a>
           </div>
-          <a href="#mehsullar" className="hidden items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 sm:flex">
-            Bütün məhsullar <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-          {products.map((p, i) => (
-            <div key={p.name} className="group flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white transition hover:shadow-xl hover:shadow-slate-100">
-              <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${swatches[i]}`}>
-                {p.tag && (
-                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-indigo-700 backdrop-blur">
-                    {p.tag}
-                  </span>
-                )}
-                <button type="button" aria-label="Sevimlilərə əlavə et" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-600 backdrop-blur transition hover:text-fuchsia-500">
-                  <Heart className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="flex flex-1 flex-col p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-indigo-500">{p.category}</p>
-                <h3 className="mt-1 font-semibold text-slate-900">{p.name}</h3>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-lg font-black text-slate-900">{p.price} ₼</span>
-                  {p.oldPrice && (
-                    <span className="text-sm text-slate-400 line-through">{p.oldPrice} ₼</span>
+          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { name: "Kətan kostyum", tag: "Qadın", price: "189 ₼", old: "240 ₼", img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80" },
+              { name: "Klassik trençkot", tag: "Üst geyim", price: "320 ₼", old: null, img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+              { name: "İpək köynək", tag: "Yeni", price: "98 ₼", old: null, img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" },
+              { name: "Yun palto", tag: "Premium", price: "275 ₼", old: "340 ₼", img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80" },
+              { name: "Pambıq bluz", tag: "Qadın", price: "64 ₼", old: null, img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+              { name: "Geniş kəsim şalvar", tag: "Trend", price: "112 ₼", old: "145 ₼", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" },
+              { name: "Trikotaj jaket", tag: "Yeni", price: "138 ₼", old: null, img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80" },
+              { name: "Mövsüm donu", tag: "Premium", price: "156 ₼", old: "198 ₼", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+            ].map((p) => (
+              <div key={p.name} className="group">
+                <div className="relative overflow-hidden rounded-2xl bg-neutral-100">
+                  <img src={p.img} alt="" className="h-80 w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {p.old && (
+                    <span className="absolute left-3 top-3 rounded-full bg-neutral-900 px-2.5 py-1 text-xs font-medium text-white">Endirim</span>
                   )}
+                  <button type="button" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-700 opacity-0 transition-opacity hover:text-neutral-900 group-hover:opacity-100">
+                    <Heart className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
                 </div>
-                <button type="button" className="mt-4 flex items-center justify-center gap-2 rounded-full bg-slate-900 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-600">
-                  <ShoppingCart className="h-4 w-4" />
-                  Səbətə at
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Perks */}
-      <section id="ustunlukler" className="bg-slate-50 py-16">
-        <div className="mx-auto max-w-7xl px-5">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black tracking-tight">Niyə Ayla Store?</h2>
-            <p className="mt-2 text-slate-500">Alış-verişi rahat və etibarlı edirik</p>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {perks.map((perk) => (
-              <div key={perk.title} className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-                  <perk.icon className="h-6 w-6" />
+                <div className="mt-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">{p.tag}</p>
+                  <h3 className="mt-1 text-base font-medium text-neutral-900">{p.name}</h3>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-semibold text-neutral-900">{p.price}</span>
+                      {p.old && <span className="text-sm text-neutral-400 line-through">{p.old}</span>}
+                    </div>
+                    <button type="button" className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3.5 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-neutral-900 hover:bg-neutral-900 hover:text-white">
+                      <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      Səbətə at
+                    </button>
+                  </div>
                 </div>
-                <h3 className="mt-4 text-lg font-bold">{perk.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-500">{perk.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Newsletter / subscribe form */}
-      <section id="abune" className="mx-auto max-w-7xl px-5 py-16">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-14 text-center sm:px-12">
-          <div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative mx-auto max-w-xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white">
-              <Send className="h-3.5 w-3.5" />
-              Bülletenə abunə ol
-            </span>
-            <h2 className="mt-5 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              İlk sifarişinə 10% endirim qazan
+      {/* About / store */}
+      <section id="haqqimizda" className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="relative overflow-hidden rounded-[2rem]">
+            <img
+              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80"
+              alt=""
+              className="h-[520px] w-full object-cover"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">Haqqımızda</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              2018-ci ildən Bakıda zövqlü geyimin ünvanı
             </h2>
-            <p className="mt-3 text-base text-white/80">
-              Yeni kolleksiyalar, özəl endirimlər və yalnız abunəçilərə özəl təkliflərdən
-              ilk sən xəbər tut.
+            <p className="mt-6 text-lg leading-relaxed text-neutral-600">
+              Ayla Store seçilmiş brendləri və öz dizaynlarımızı bir araya gətirən müstəqil butikdir. Hər məhsulu parçasından tikişinə qədər diqqətlə seçirik — gündəlik geyimdən xüsusi anlara qədər.
             </p>
-            <form className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
-              <input
-                type="email"
-                placeholder="E-mail ünvanınız"
-                className="h-12 flex-1 rounded-full border-0 bg-white px-5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
-              />
-              <button type="button" className="h-12 rounded-full bg-slate-900 px-7 text-sm font-semibold text-white transition hover:bg-slate-800">
-                Abunə ol
+            <div className="mt-9 grid grid-cols-2 gap-6">
+              {[
+                { k: "8 il", v: "Etibarlı təcrübə" },
+                { k: "12K+", v: "Məmnun müştəri" },
+                { k: "400+", v: "Aktiv məhsul" },
+                { k: "4.9", v: "Orta reytinq" },
+              ].map((s) => (
+                <div key={s.v} className="rounded-2xl border border-neutral-200 bg-white p-6">
+                  <p className="text-3xl font-semibold tracking-tight text-neutral-900">{s.k}</p>
+                  <p className="mt-1.5 text-sm text-neutral-500">{s.v}</p>
+                </div>
+              ))}
+            </div>
+            <a href="#elaqe" className="mt-9 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800">
+              Mağazaya gəlin
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="border-y border-neutral-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="text-center">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">Rəylər</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Müştərilərimiz nə deyir</h2>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[
+              { name: "Nigar Əliyeva", role: "Daimi müştəri", text: "Keyfiyyət gözləntimdən yüksək çıxdı. Kətan kostyumu artıq ikinci dəfə alıram, kəsimi əla oturur." },
+              { name: "Rəşad Hüseynov", role: "Bakı", text: "Çatdırılma sürətli, qablaşdırma səliqəli idi. Mağazadakı işçilər çox köməkçi oldular." },
+              { name: "Leyla Məmmədova", role: "Stilist", text: "Müştərilərim üçün buradan seçim edirəm. Həm trend, həm də klassik parçalar bir yerdə." },
+            ].map((t) => (
+              <div key={t.name} className="rounded-2xl border border-neutral-200 bg-[#faf9f7] p-7">
+                <Quote className="h-7 w-7 text-neutral-300" strokeWidth={1.5} />
+                <div className="mt-4 flex gap-0.5">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} className="h-4 w-4 fill-neutral-900 text-neutral-900" strokeWidth={0} />
+                  ))}
+                </div>
+                <p className="mt-4 text-[15px] leading-relaxed text-neutral-700">{t.text}</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-sm font-medium text-white">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900">{t.name}</p>
+                    <p className="text-xs text-neutral-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact / newsletter */}
+      <section id="elaqe" className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">Əlaqə</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Yeniliklərdən ilk xəbər tutun
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600">
+              Yeni kolleksiyalar, məxsusi endirimlər və mağaza tədbirləri barədə birbaşa məlumat alın. Sualınız varsa, bizimlə əlaqə saxlayın.
+            </p>
+            <div className="mt-9 space-y-4">
+              <div className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-900">
+                  <MapPin className="h-5 w-5" strokeWidth={1.75} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-neutral-900">Ünvan</p>
+                  <p className="text-sm text-neutral-500">Nizami küçəsi 28, Bakı şəhəri</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-900">
+                  <Phone className="h-5 w-5" strokeWidth={1.75} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-neutral-900">Telefon</p>
+                  <p className="text-sm text-neutral-500">+994 12 555 18 24</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-900">
+                  <Mail className="h-5 w-5" strokeWidth={1.75} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-neutral-900">E-poçt</p>
+                  <p className="text-sm text-neutral-500">salam@aylastore.az</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-neutral-200 bg-white p-8 sm:p-10">
+            <form className="space-y-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-neutral-700">Ad</label>
+                  <input type="text" placeholder="Adınız" className="w-full rounded-xl border border-neutral-200 bg-[#faf9f7] px-4 py-3 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-900" />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-neutral-700">Telefon</label>
+                  <input type="tel" placeholder="+994" className="w-full rounded-xl border border-neutral-200 bg-[#faf9f7] px-4 py-3 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-900" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-neutral-700">E-poçt</label>
+                <input type="email" placeholder="siz@nümunə.az" className="w-full rounded-xl border border-neutral-200 bg-[#faf9f7] px-4 py-3 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-900" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-neutral-700">Mesaj</label>
+                <textarea rows={4} placeholder="Sualınızı yazın..." className="w-full resize-none rounded-xl border border-neutral-200 bg-[#faf9f7] px-4 py-3 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-900" />
+              </div>
+              <label className="flex items-start gap-3 text-sm text-neutral-600">
+                <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-md border border-neutral-300 bg-[#faf9f7]">
+                  <Check className="h-3.5 w-3.5 text-neutral-900" strokeWidth={2.5} />
+                </span>
+                Endirim və yeniliklər üçün abunə olmaq istəyirəm
+              </label>
+              <button type="button" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-800">
+                Göndər
+                <Send className="h-4 w-4" strokeWidth={1.75} />
               </button>
             </form>
-            <p className="mt-4 text-xs text-white/60">
-              İstənilən vaxt abunəlikdən çıxa bilərsiniz. Spam göndərmirik.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-100 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-14">
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-5">
-            <div className="col-span-2">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-base font-black text-white">
-                  A
+      <footer className="border-t border-neutral-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-16">
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:grid-cols-5">
+            <div className="col-span-2 lg:col-span-2">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 text-white">
+                  <ShoppingBag className="h-4 w-4" strokeWidth={1.75} />
                 </div>
-                <span className="text-xl font-extrabold tracking-tight">
-                  Ayla<span className="text-indigo-600">Store</span>
-                </span>
+                <span className="text-lg font-semibold tracking-tight">Ayla Store</span>
               </div>
-              <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
-                Bakının müasir onlayn butiki. Üslub, keyfiyyət və rahatlığı bir araya
-                gətiririk.
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-500">
+                Bakının mərkəzində zövqlü geyim butiki. Müasir kəsimlər, keyfiyyətli parçalar, hər mövsümə uyğun dizayn.
               </p>
-              <div className="mt-5 flex gap-3">
-                <a href="#abune" aria-label="Aperture" className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-indigo-600 hover:text-white">
-                  <AtSign className="h-5 w-5" />
-                </a>
-                <a href="#abune" aria-label="Mesaj" className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-indigo-600 hover:text-white">
-                  <MessageCircle className="h-5 w-5" />
-                </a>
+              <div className="mt-6 flex items-center gap-3">
+                {[
+                  <svg key="ig" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>,
+                  <svg key="fb" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M14 9h3l.5-3H14V4.5c0-.9.3-1.5 1.6-1.5H17V.2C16.7.1 15.6 0 14.4 0 11.9 0 10 1.5 10 4.3V6H7v3h3v9h4V9z" /></svg>,
+                  <svg key="tg" viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.6"><path d="M21 4L3 11l6 2 2 6 4-5 4 4 2-14z" strokeLinejoin="round" /></svg>,
+                ].map((icon, i) => (
+                  <a key={i} href="#elaqe" className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition-colors hover:border-neutral-900 hover:text-neutral-900">
+                    {icon}
+                  </a>
+                ))}
               </div>
             </div>
-
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wide text-slate-900">Mağaza</h4>
-              <ul className="mt-4 space-y-3 text-sm text-slate-500">
-                <li><a href="#mehsullar" className="hover:text-indigo-600">Yeni gələnlər</a></li>
-                <li><a href="#mehsullar" className="hover:text-indigo-600">Çox satılanlar</a></li>
-                <li><a href="#abune" className="hover:text-indigo-600">Endirimlər</a></li>
-                <li><a href="#kateqoriyalar" className="hover:text-indigo-600">Kateqoriyalar</a></li>
+              <p className="text-sm font-semibold text-neutral-900">Mağaza</p>
+              <ul className="mt-4 space-y-3 text-sm text-neutral-500">
+                <li><a href="#mehsullar" className="transition-colors hover:text-neutral-900">Məhsullar</a></li>
+                <li><a href="#kateqoriya" className="transition-colors hover:text-neutral-900">Kateqoriyalar</a></li>
+                <li><a href="#mehsullar" className="transition-colors hover:text-neutral-900">Yeni gələnlər</a></li>
+                <li><a href="#mehsullar" className="transition-colors hover:text-neutral-900">Endirimlər</a></li>
               </ul>
             </div>
-
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wide text-slate-900">Dəstək</h4>
-              <ul className="mt-4 space-y-3 text-sm text-slate-500">
-                <li><a href="#ustunlukler" className="hover:text-indigo-600">Çatdırılma</a></li>
-                <li><a href="#ustunlukler" className="hover:text-indigo-600">Qaytarma</a></li>
-                <li><a href="#ustunlukler" className="hover:text-indigo-600">Ölçü cədvəli</a></li>
-                <li><a href="#ustunlukler" className="hover:text-indigo-600">Tez-tez soruşulan</a></li>
+              <p className="text-sm font-semibold text-neutral-900">Şirkət</p>
+              <ul className="mt-4 space-y-3 text-sm text-neutral-500">
+                <li><a href="#haqqimizda" className="transition-colors hover:text-neutral-900">Haqqımızda</a></li>
+                <li><a href="#elaqe" className="transition-colors hover:text-neutral-900">Əlaqə</a></li>
+                <li><a href="#elaqe" className="transition-colors hover:text-neutral-900">Çatdırılma</a></li>
+                <li><a href="#elaqe" className="transition-colors hover:text-neutral-900">Qaytarma</a></li>
               </ul>
             </div>
-
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wide text-slate-900">Əlaqə</h4>
-              <ul className="mt-4 space-y-3 text-sm text-slate-500">
-                <li>Nizami küç. 28, Bakı</li>
-                <li>+994 50 412 18 76</li>
-                <li>salam@aylastore.az</li>
-                <li>Hər gün 09:00–21:00</li>
+              <p className="text-sm font-semibold text-neutral-900">İş saatları</p>
+              <ul className="mt-4 space-y-3 text-sm text-neutral-500">
+                <li>B.e – Cümə: 10:00–20:00</li>
+                <li>Şənbə: 10:00–18:00</li>
+                <li>Bazar: 12:00–17:00</li>
               </ul>
             </div>
           </div>
-
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-6 text-sm text-slate-400 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 text-sm text-neutral-500 sm:flex-row">
             <p>© 2026 Ayla Store. Bütün hüquqlar qorunur.</p>
-            <div className="flex gap-6">
-              <a href="#abune" className="hover:text-indigo-600">Məxfilik</a>
-              <a href="#abune" className="hover:text-indigo-600">Şərtlər</a>
-              <a href="#abune" className="hover:text-indigo-600">Çərəzlər</a>
+            <div className="flex items-center gap-6">
+              <a href="#elaqe" className="transition-colors hover:text-neutral-900">Məxfilik</a>
+              <a href="#elaqe" className="transition-colors hover:text-neutral-900">Şərtlər</a>
             </div>
           </div>
         </div>

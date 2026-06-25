@@ -18,12 +18,15 @@ export function PublishPanel({ open, onClose, siteId, siteName }: PublishPanelPr
   const [url, setUrl] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
   React.useEffect(() => {
     if (!open) return;
     setUrl(null);
     setError(null);
     setCopied(false);
+    setTitle(siteName ?? "");
     fetch("/api/connections")
       .then((r) => r.json())
       .then((d: { connections?: { provider: string }[] }) => {
@@ -32,7 +35,7 @@ export function PublishPanel({ open, onClose, siteId, siteName }: PublishPanelPr
         setConnected(map);
       })
       .catch(() => {});
-  }, [open]);
+  }, [open, siteName]);
 
   if (!open) return null;
 
@@ -47,7 +50,7 @@ export function PublishPanel({ open, onClose, siteId, siteName }: PublishPanelPr
       const res = await fetch("/api/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ siteId }),
+        body: JSON.stringify({ siteId, title, description }),
       });
       const data = await res.json();
       if (res.ok && data.url) setUrl(data.url);
@@ -117,6 +120,35 @@ export function PublishPanel({ open, onClose, siteId, siteName }: PublishPanelPr
           <div className="mt-4 space-y-2">
             <StatusRow label="Vercel" sub="Hosting və canlı URL" ok={vercelConnected} />
             <StatusRow label="Supabase" sub="Form bazası (istəyə görə)" ok={!!connected.supabase} />
+          </div>
+
+          {/* website info (SEO + sharing) */}
+          <div className="mt-4 rounded-2xl border border-border p-4">
+            <p className="text-[13px] font-semibold">Sayt məlumatı</p>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              Google və paylaşımda görünən başlıq və təsvir.
+            </p>
+            <label className="mt-3 block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Başlıq
+            </label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={60}
+              placeholder="Sayt başlığı"
+              className="mt-1 h-9 w-full rounded-lg border border-border bg-background px-3 text-[13px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
+            />
+            <label className="mt-2.5 block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Təsvir
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={160}
+              rows={2}
+              placeholder="Qısa təsvir (160 simvola qədər)"
+              className="mt-1 w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-[13px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
+            />
           </div>
 
           {/* custom domain */}

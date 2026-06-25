@@ -297,3 +297,13 @@
     animation: none !important;
   }
 }
+
+/* Keyboard accessibility: a clear focus ring only for keyboard users. */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring) / 0.75);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
