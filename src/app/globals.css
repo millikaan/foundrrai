@@ -197,6 +197,7 @@
 
 .brand-mark {
   background: linear-gradient(135deg, hsl(var(--grad-pink)), hsl(var(--grad-orange)) 55%, hsl(var(--grad-violet)));
+  border-radius: 9999px; /* circular logo everywhere (overrides rounded-* utilities) */
 }
 
 /* ---------- Entrance + reveal motion ---------- */
