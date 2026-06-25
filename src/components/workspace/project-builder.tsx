@@ -657,13 +657,6 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
               }}
             />
           ))}
-
-          {phase === "built" ? (
-            <div className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/5 p-3.5 text-[13px]">
-              <Check className="h-4 w-4 text-primary" />
-              Sayt hazırdır — sağda nəzərdən keçir, aşağıda dəyişiklik istə.
-            </div>
-          ) : null}
         </div>
 
         <form onSubmit={onRefine} className="border-t border-border p-3">
