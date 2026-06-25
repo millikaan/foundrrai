@@ -9,7 +9,7 @@ export const runtime = "nodejs";
  */
 export async function GET(request: Request) {
   const origin = new URL(request.url).origin;
-  const slug = process.env.VERCEL_INTEGRATION_SLUG;
+  const slug = process.env.FOUNDRR_VERCEL_INTEGRATION_SLUG;
 
   if (!slug) {
     return NextResponse.redirect(`${origin}/workspace?connect=vercel_unconfigured`);

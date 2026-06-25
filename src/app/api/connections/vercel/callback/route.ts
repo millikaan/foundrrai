@@ -15,8 +15,8 @@ export async function GET(request: Request) {
   const teamId = searchParams.get("teamId");
   const configurationId = searchParams.get("configurationId");
 
-  const clientId = process.env.VERCEL_CLIENT_ID;
-  const clientSecret = process.env.VERCEL_CLIENT_SECRET;
+  const clientId = process.env.FOUNDRR_VERCEL_CLIENT_ID;
+  const clientSecret = process.env.FOUNDRR_VERCEL_CLIENT_SECRET;
   if (!code || !clientId || !clientSecret) {
     return NextResponse.redirect(`${origin}/workspace?connect=vercel_error`);
   }
