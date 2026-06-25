@@ -628,11 +628,6 @@ function ConnectionsTab({
   const [connected, setConnected] = React.useState<Record<string, boolean>>(
     justConnected ? { [justConnected]: true } : {},
   );
-  const [vercel, setVercel] = React.useState("");
-  const [supaRef, setSupaRef] = React.useState("");
-  const [supaToken, setSupaToken] = React.useState("");
-  const [saving, setSaving] = React.useState<string | null>(null);
-
   React.useEffect(() => {
     fetch("/api/connections")
       .then((r) => r.json())
@@ -643,29 +638,6 @@ function ConnectionsTab({
       })
       .catch(() => {});
   }, []);
-
-  const save = async (
-    provider: string,
-    token: string,
-    meta?: Record<string, unknown>,
-  ) => {
-    if (!token.trim()) return;
-    setSaving(provider);
-    try {
-      const res = await fetch("/api/connections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider, token, meta }),
-      });
-      if (res.ok) {
-        setConnected((c) => ({ ...c, [provider]: true }));
-        if (provider === "vercel") setVercel("");
-        if (provider === "supabase") setSupaToken("");
-      }
-    } finally {
-      setSaving(null);
-    }
-  };
 
   return (
     <div className="max-w-[520px]">
@@ -680,7 +652,7 @@ function ConnectionsTab({
             <X className="h-4 w-4" strokeWidth={3} />
           </span>
           <div>
-            <p className="text-[14px] font-semibold text-red-700">Vercel qoşulmadı</p>
+            <p className="text-[14px] font-semibold text-red-700">Hesab qoşulmadı</p>
             <p className="text-[12.5px] text-red-700/80">
               {CONNECT_ERROR_MESSAGE[connectError] ?? CONNECT_ERROR_MESSAGE.unknown}
             </p>
@@ -712,107 +684,85 @@ function ConnectionsTab({
         </div>
       ) : null}
 
-      <div className="mt-6 rounded-2xl border border-border p-5">
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 text-[15px] font-semibold">
-            <svg viewBox="0 0 76 65" aria-hidden className="h-3.5 w-3.5 fill-current">
-              <path d="M37.53 0 75.06 65H0z" />
-            </svg>
-            Vercel
-          </span>
-          {connected.vercel ? (
-            <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
-              <Check className="h-3.5 w-3.5" /> Qoşuldu
-            </span>
-          ) : null}
-        </div>
-        <p className="mt-1 text-[12px] text-muted-foreground">
-          Saytın öz Vercel hesabına yayımlanır — canlı URL alırsan.
-        </p>
-        <label className="mt-3 block text-[12px] font-medium text-foreground">
-          Vercel Access Token
-        </label>
-        <div className="mt-1.5 flex gap-2">
-          <input
-            type="password"
-            value={vercel}
-            onChange={(e) => setVercel(e.target.value)}
-            placeholder="vercel_…"
-            className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-[13px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
-          />
-          <SaveBtn loading={saving === "vercel"} onClick={() => save("vercel", vercel)} />
-        </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-          <a
-            href="https://vercel.com/account/settings/tokens"
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium text-primary hover:underline"
-          >
-            vercel.com/account/settings/tokens
-          </a>{" "}
-          → “Create Token” → kopyala və bura yapışdır. Ən sürətli və etibarlı yoldur.
-        </p>
-        <a
+      <div className="mt-6 space-y-4">
+        <ProviderCard
+          name="Vercel"
+          logo={VERCEL_LOGO}
+          desc="Saytın öz Vercel hesabına yayımlanır — canlı URL alırsan."
+          connected={!!connected.vercel}
           href="/api/connections/vercel/authorize"
-          className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <svg viewBox="0 0 76 65" aria-hidden className="h-3 w-3 fill-current">
-            <path d="M37.53 0 75.06 65H0z" />
-          </svg>
-          və ya Vercel inteqrasiyası ilə avtomatik qoşul
-        </a>
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-border p-5">
-        <div className="flex items-center justify-between">
-          <span className="text-[15px] font-semibold">Supabase</span>
-          {connected.supabase ? (
-            <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
-              <Check className="h-3.5 w-3.5" /> Qoşuldu
-            </span>
-          ) : null}
-        </div>
-        <p className="mt-1 text-[12px] text-muted-foreground">
-          Form məlumatları üçün baza. supabase.com/dashboard/account/tokens.
-        </p>
-        <input
-          value={supaRef}
-          onChange={(e) => setSupaRef(e.target.value)}
-          placeholder="Layihə ref (məs: abcd1234efgh)"
-          className="mt-3 h-10 w-full rounded-xl border border-border bg-background px-3 text-[13px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
         />
-        <div className="mt-2 flex gap-2">
-          <input
-            type="password"
-            value={supaToken}
-            onChange={(e) => setSupaToken(e.target.value)}
-            placeholder="sbp_…"
-            className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-[13px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
-          />
-          <SaveBtn
-            loading={saving === "supabase"}
-            onClick={() => save("supabase", supaToken, { ref: supaRef.trim() })}
-          />
-        </div>
+        <ProviderCard
+          name="Supabase"
+          logo={SUPABASE_LOGO}
+          desc="Form və rezervasiyalar üçün baza — öz Supabase hesabında."
+          connected={!!connected.supabase}
+          href="/api/connections/supabase/authorize"
+        />
       </div>
 
       <p className="mt-4 text-[12px] text-muted-foreground">
-        Açarlar şifrələnmiş şəkildə, yalnız server tərəfində saxlanılır.
+        Hesablar OAuth ilə qoşulur — token yapışdırmağa ehtiyac yoxdur. Açarlar
+        şifrələnmiş şəkildə, yalnız server tərəfində saxlanılır.
       </p>
     </div>
   );
 }
 
-function SaveBtn({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+const VERCEL_LOGO = (
+  <svg viewBox="0 0 76 65" aria-hidden className="h-4 w-4 fill-current">
+    <path d="M37.53 0 75.06 65H0z" />
+  </svg>
+);
+
+const SUPABASE_LOGO = (
+  <svg viewBox="0 0 109 113" aria-hidden className="h-4 w-4">
+    <path
+      d="M63.708 110.284c-2.86 3.601-8.658 1.629-8.726-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874l-43.152 54.347Z"
+      fill="#3ECF8E"
+      opacity="0.85"
+    />
+    <path
+      d="M45.317 2.071c2.86-3.601 8.658-1.629 8.726 2.97l.442 67.251H9.831C1.641 72.292-2.927 62.832 2.166 56.418L45.317 2.071Z"
+      fill="#3ECF8E"
+    />
+  </svg>
+);
+
+function ProviderCard({
+  name,
+  logo,
+  desc,
+  connected,
+  href,
+}: {
+  name: string;
+  logo: React.ReactNode;
+  desc: string;
+  connected: boolean;
+  href: string;
+}) {
   return (
-    <button
-      onClick={onClick}
-      disabled={loading}
-      className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-foreground px-4 text-[13px] font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-    >
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-      Qoş
-    </button>
+    <div className="rounded-2xl border border-border p-5">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2 text-[15px] font-semibold">
+          {logo}
+          {name}
+        </span>
+        {connected ? (
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
+            <Check className="h-3.5 w-3.5" /> Qoşuldu
+          </span>
+        ) : null}
+      </div>
+      <p className="mt-1 text-[12px] text-muted-foreground">{desc}</p>
+      <a
+        href={href}
+        className="mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-foreground text-[13px] font-medium text-background transition-colors hover:bg-foreground/90"
+      >
+        {logo}
+        {connected ? `${name} hesabını dəyiş` : `${name} ilə qoşul`}
+      </a>
+    </div>
   );
 }

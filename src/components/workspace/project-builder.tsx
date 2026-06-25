@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   ArrowUp,
   Check,
+  Eye,
   FileText,
   History,
   Loader2,
@@ -101,6 +102,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const fixGaveUpRef = React.useRef(false);
   const [publishOpen, setPublishOpen] = React.useState(false);
   const [versionsOpen, setVersionsOpen] = React.useState(false);
+  const [mobileView, setMobileView] = React.useState<"chat" | "preview">("chat");
 
   /** Restore the live project to a previous checkpoint's file tree. */
   const restoreCheckpoint = (restored: ProjectFile[]) => {
@@ -112,6 +114,11 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       { id: makeId(), type: "note", text: "Əvvəlki versiya bərpa olundu.", tone: "ok" },
     ]);
   };
+
+  // On mobile, jump to the preview once the site is built so they see the result.
+  React.useEffect(() => {
+    if (phase === "built") setMobileView("preview");
+  }, [phase]);
 
   /** Immutably patch a single block by id. */
   const patchBlock = React.useCallback(
@@ -629,9 +636,15 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const lastPlanId = [...blocks].reverse().find((b) => b.type === "plan")?.id ?? null;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen flex-col overflow-hidden md:flex-row">
       {/* ── Agent panel ── */}
-      <section className="flex w-full max-w-[440px] flex-col border-r border-border bg-card/30">
+      <section
+        className={cn(
+          "w-full min-w-0 flex-col border-border bg-card/30 pb-14 md:w-[440px] md:flex-none md:border-r md:pb-0",
+          mobileView === "chat" ? "flex flex-1" : "hidden",
+          "md:flex",
+        )}
+      >
         <header className="flex h-14 items-center justify-between border-b border-border px-4">
           <button
             onClick={() => router.push("/workspace")}
@@ -772,16 +785,50 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       </section>
 
       {/* ── Preview panel ── */}
-      <PreviewPane
-        phase={phase}
-        files={files}
-        siteName={siteName}
-        siteId={siteId}
-        activeFile={activeFile}
-        onSelectFile={setActiveFile}
-        onBuildError={handleBuildError}
-        onPublish={() => setPublishOpen(true)}
-      />
+      <div
+        className={cn(
+          "min-h-0 min-w-0 pb-14 md:pb-0",
+          mobileView === "preview" ? "flex flex-1" : "hidden",
+          "md:flex md:flex-1",
+        )}
+      >
+        <PreviewPane
+          phase={phase}
+          files={files}
+          siteName={siteName}
+          siteId={siteId}
+          activeFile={activeFile}
+          onSelectFile={setActiveFile}
+          onBuildError={handleBuildError}
+          onPublish={() => setPublishOpen(true)}
+        />
+      </div>
+
+      {/* mobile chat/preview switcher */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex h-12 border-t border-border bg-card md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileView("chat")}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-1.5 text-[13px] font-medium transition-colors",
+            mobileView === "chat" ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
+          <Sparkles className="h-4 w-4" />
+          Söhbət
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileView("preview")}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-1.5 text-[13px] font-medium transition-colors",
+            mobileView === "preview" ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
+          <Eye className="h-4 w-4" />
+          Önizləmə
+        </button>
+      </div>
 
       <PublishPanel
         open={publishOpen}

@@ -56,7 +56,9 @@ export function ProfileMenu({
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("settings");
     const connected = params.get("connected") ?? undefined;
-    const connectErr = params.get("connect") === "vercel_error" ? (params.get("reason") ?? "unknown") : undefined;
+    const connectErr = (params.get("connect") ?? "").endsWith("_error")
+      ? (params.get("reason") ?? "unknown")
+      : undefined;
     const connectDtl = params.get("detail") ?? undefined;
     const upgraded = params.get("upgraded");
 
