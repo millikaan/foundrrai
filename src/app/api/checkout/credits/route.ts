@@ -66,14 +66,16 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: STRIPE_CURRENCY,
-            product_data: { name: `Foundrr — ${pack.name}` },
-            unit_amount: pack.amount,
-          },
-        },
+        pack.priceId
+          ? { price: pack.priceId, quantity: 1 }
+          : {
+              quantity: 1,
+              price_data: {
+                currency: STRIPE_CURRENCY,
+                product_data: { name: `Foundrr — ${pack.name}` },
+                unit_amount: pack.amount,
+              },
+            },
       ],
       customer_email: user.email ?? undefined,
       success_url: `${origin}/workspace?credits=added`,

@@ -92,12 +92,31 @@ export interface CreditPack {
   credits: number;
   amount: number;
   name: string;
+  priceId?: string;
 }
 
 export const CREDIT_PACKS: ReadonlyArray<CreditPack> = [
-  { id: "credits_100", credits: 100, amount: 999, name: "100 kredit" },
-  { id: "credits_300", credits: 300, amount: 2499, name: "300 kredit" },
-  { id: "credits_600", credits: 600, amount: 3999, name: "600 kredit" },
+  {
+    id: "credits_100",
+    credits: 100,
+    amount: 999,
+    name: "100 kredit",
+    priceId: process.env.STRIPE_PRICE_CREDITS_100,
+  },
+  {
+    id: "credits_300",
+    credits: 300,
+    amount: 2499,
+    name: "300 kredit",
+    priceId: process.env.STRIPE_PRICE_CREDITS_300,
+  },
+  {
+    id: "credits_600",
+    credits: 600,
+    amount: 3999,
+    name: "600 kredit",
+    priceId: process.env.STRIPE_PRICE_CREDITS_600,
+  },
 ];
 
 export function getCreditPack(id: unknown): CreditPack | null {
