@@ -65,6 +65,7 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      allow_promotion_codes: true,
       line_items: [
         pack.priceId
           ? { price: pack.priceId, quantity: 1 }
