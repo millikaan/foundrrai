@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Code2, Eye, Monitor, Rocket, Smartphone } from "lucide-react";
+import { Code2, Eye, Monitor, MousePointerClick, Rocket, Smartphone } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { Phase } from "@/lib/workspace/build-session";
@@ -26,6 +26,7 @@ interface PreviewPaneProps {
   onSelectFile: (path: string) => void;
   onBuildError?: (error: string) => void;
   onPublish?: () => void;
+  onElementPick?: (info: { text: string; tag: string }) => void;
 }
 
 export function PreviewPane({
@@ -37,9 +38,11 @@ export function PreviewPane({
   onSelectFile,
   onBuildError,
   onPublish,
+  onElementPick,
 }: PreviewPaneProps) {
   const [tab, setTab] = React.useState<Tab>("preview");
   const [device, setDevice] = React.useState<Device>("desktop");
+  const [selecting, setSelecting] = React.useState(false);
   const built = phase === "built" && files.length > 0;
   const buildKey = siteId ?? "draft";
 
@@ -71,20 +74,35 @@ export function PreviewPane({
         {built ? (
           <div className="flex items-center gap-2">
             {tab === "preview" ? (
-              <div className="flex items-center rounded-xl border border-border bg-card p-0.5">
-                <IconToggle
-                  active={device === "desktop"}
-                  onClick={() => setDevice("desktop")}
-                  label="Masaüstü"
-                  icon={Monitor}
-                />
-                <IconToggle
-                  active={device === "mobile"}
-                  onClick={() => setDevice("mobile")}
-                  label="Mobil"
-                  icon={Smartphone}
-                />
-              </div>
+              <>
+                <button
+                  onClick={() => setSelecting((s) => !s)}
+                  title="Elementi seçib dəyiş"
+                  className={cn(
+                    "inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-[13px] font-medium transition-colors",
+                    selecting
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <MousePointerClick className="h-3.5 w-3.5" />
+                  Seç
+                </button>
+                <div className="flex items-center rounded-xl border border-border bg-card p-0.5">
+                  <IconToggle
+                    active={device === "desktop"}
+                    onClick={() => setDevice("desktop")}
+                    label="Masaüstü"
+                    icon={Monitor}
+                  />
+                  <IconToggle
+                    active={device === "mobile"}
+                    onClick={() => setDevice("mobile")}
+                    label="Mobil"
+                    icon={Smartphone}
+                  />
+                </div>
+              </>
             ) : null}
             <button
               onClick={onPublish}
@@ -114,6 +132,11 @@ export function PreviewPane({
                 device={device}
                 buildKey={buildKey}
                 onBuildError={onBuildError}
+                selecting={selecting}
+                onPick={(info) => {
+                  setSelecting(false);
+                  onElementPick?.(info);
+                }}
               />
             </div>
             <div className={cn("absolute inset-0", tab === "code" ? "z-10" : "hidden")}>

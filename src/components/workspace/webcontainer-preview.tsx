@@ -28,6 +28,20 @@ const STATUS_LABEL: Record<Exclude<Status, "ready" | "error">, string> = {
 const ERROR_RE =
   /\[plugin:|\[postcss\]|Internal server error|Failed to compile|Pre-transform error|does not exist|error during (build|closeBundle)|error TS\d|✘ \[ERROR\]/i;
 
+/** Click-to-select script injected into the PREVIEW's index.html only (never deployed). */
+const SELECT_SCRIPT = `(function(){var on=false,last=null;function clr(){if(last&&last.style){last.style.outline='';last.style.outlineOffset='';last.style.cursor='';}last=null;}window.addEventListener('message',function(e){var d=e.data||{};if(d&&d.type==='foundrr:select'){on=!!d.on;if(!on)clr();}});document.addEventListener('mouseover',function(e){if(!on)return;clr();last=e.target;if(last&&last.style){last.style.outline='2px solid #7735E9';last.style.outlineOffset='1px';last.style.cursor='pointer';}},true);document.addEventListener('click',function(e){if(!on)return;e.preventDefault();e.stopPropagation();var el=e.target||{};var t=((el.innerText||el.textContent||'')+'').trim().slice(0,140);parent.postMessage({type:'foundrr:picked',text:t,tag:((el.tagName||'')+'').toLowerCase()},'*');on=false;clr();},true);})();`;
+
+function withSelector(files: ProjectFile[]): ProjectFile[] {
+  return files.map((f) => {
+    if (f.path !== "index.html") return f;
+    const tag = `<script>${SELECT_SCRIPT}</script>`;
+    const content = f.content.includes("</body>")
+      ? f.content.replace("</body>", `${tag}</body>`)
+      : f.content + tag;
+    return { ...f, content };
+  });
+}
+
 interface WebContainerPreviewProps {
   files: ProjectFile[];
   device: "desktop" | "mobile";
@@ -35,6 +49,10 @@ interface WebContainerPreviewProps {
   buildKey: string;
   /** Called with the captured error text when the dev server reports a build error. */
   onBuildError?: (error: string) => void;
+  /** When true, clicking an element in the preview selects it instead of acting. */
+  selecting?: boolean;
+  /** Fired with the picked element's text + tag when the user clicks one. */
+  onPick?: (info: { text: string; tag: string }) => void;
 }
 
 export function WebContainerPreview({
@@ -42,7 +60,26 @@ export function WebContainerPreview({
   device,
   buildKey,
   onBuildError,
+  selecting,
+  onPick,
 }: WebContainerPreviewProps) {
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const onPickRef = React.useRef(onPick);
+  React.useEffect(() => {
+    onPickRef.current = onPick;
+  });
+
+  // Receive element picks from the injected preview script.
+  React.useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      const d = e.data as { type?: string; text?: string; tag?: string } | null;
+      if (d && d.type === "foundrr:picked") {
+        onPickRef.current?.({ text: d.text ?? "", tag: d.tag ?? "" });
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
   const [status, setStatus] = React.useState<Status>("booting");
   const [errorMsg, setErrorMsg] = React.useState("");
   const [url, setUrl] = React.useState<string | null>(null);
@@ -92,7 +129,7 @@ export function WebContainerPreview({
         if (disposed) return;
 
         killDevProcess();
-        await container.mount(toFileSystemTree(files));
+        await container.mount(toFileSystemTree(withSelector(files)));
         if (disposed) return;
 
         container.on("server-ready", (_port, readyUrl) => {
@@ -162,6 +199,14 @@ export function WebContainerPreview({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
+  // Toggle select-mode inside the preview iframe.
+  React.useEffect(() => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "foundrr:select", on: !!selecting },
+      "*",
+    );
+  }, [selecting, url]);
+
   if (status === "error") {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
@@ -187,11 +232,20 @@ export function WebContainerPreview({
       >
         {url ? (
           <iframe
+            ref={iframeRef}
             src={url}
             title="Sayt önizləməsi"
             className="h-full w-full bg-white"
             allow="cross-origin-isolated"
           />
+        ) : null}
+
+        {selecting ? (
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-3">
+            <span className="rounded-full bg-foreground/90 px-3 py-1.5 text-[12px] font-medium text-background shadow-lg backdrop-blur">
+              Dəyişmək istədiyin hissəyə toxun
+            </span>
+          </div>
         ) : null}
 
         {status !== "ready" ? (

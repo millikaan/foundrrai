@@ -93,6 +93,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const [attaching, setAttaching] = React.useState(false);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const refineRef = React.useRef<HTMLTextAreaElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const started = React.useRef(false);
   const ready = React.useRef(false);
@@ -119,6 +120,20 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   React.useEffect(() => {
     if (phase === "built") setMobileView("preview");
   }, [phase]);
+
+  /** User clicked an element in the preview — target it in the chat for an edit. */
+  const onElementPick = (info: { text: string; tag: string }) => {
+    const label = info.text ? `“${info.text}”` : `bu ${info.tag || "element"}`;
+    setRefine(`${label} hissəsini dəyiş: `);
+    setMobileView("chat");
+    setTimeout(() => {
+      const el = refineRef.current;
+      if (el) {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      }
+    }, 60);
+  };
 
   /** Immutably patch a single block by id. */
   const patchBlock = React.useCallback(
@@ -734,6 +749,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
 
           <div className="rounded-2xl border border-border bg-card p-2.5 shadow-[0_10px_30px_-22px_hsl(240_22%_13%/0.4)] transition-colors focus-within:border-[hsl(var(--ring)/0.5)]">
             <textarea
+              ref={refineRef}
               value={refine}
               onChange={(e) => setRefine(e.target.value)}
               onKeyDown={(e) => {
@@ -801,6 +817,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
           onSelectFile={setActiveFile}
           onBuildError={handleBuildError}
           onPublish={() => setPublishOpen(true)}
+          onElementPick={onElementPick}
         />
       </div>
 
