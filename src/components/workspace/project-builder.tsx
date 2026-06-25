@@ -81,6 +81,25 @@ async function fetchFiles(
   return (data ?? []).map((d) => ({ path: d.path as string, content: d.content as string }));
 }
 
+/** Re-settle transient block states after restoring a thread; drop empty replies
+ *  (an interrupted stream would otherwise restore as a stuck "typing" bubble). */
+function normalizeBlocks(blocks: Block[]): Block[] {
+  return blocks
+    .filter((b) => !(b.type === "reply" && !b.text.trim()))
+    .map((b) => {
+      if (b.type === "thinking") return { ...b, activeIndex: -1 };
+      if (b.type === "build" || b.type === "edit")
+        return { ...b, revealed: b.files.length, done: true };
+      return b;
+    });
+}
+
+/** A restored phase must be a settled one — never a driverless animation state. */
+function clampPhase(p: Phase | undefined): Phase {
+  if (p === "thinking" || p === "building") return "built";
+  return p ?? "built";
+}
+
 export function ProjectBuilder({ credits: initialCredits }: { credits: number }) {
   const router = useRouter();
   const [prompt, setPrompt] = React.useState("");
@@ -102,6 +121,9 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const started = React.useRef(false);
   const ready = React.useRef(false);
+  // True once the shown conversation has been reconciled with the DB copy — gates
+  // DB writes so a stale localStorage thread can't overwrite a newer one.
+  const convoSyncedRef = React.useRef(false);
   const buildStartedAt = React.useRef<number | null>(null);
   const fixingRef = React.useRef(false);
   const fixAttemptsRef = React.useRef(0);
@@ -318,41 +340,51 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
         const supabase = createClient();
         const { data: site } = await supabase
           .from("sites")
-          .select("name,prompt")
+          .select("name,prompt,conversation")
           .eq("id", id)
           .single();
         const projectFiles = await fetchFiles(supabase, id);
-        const { data: msgs } = await supabase
-          .from("messages")
-          .select("role,content,created_at")
-          .eq("site_id", id)
-          .order("created_at", { ascending: true });
-
-        const userBlocks: Block[] = (msgs ?? [])
-          .filter((m) => m.role === "user")
-          .map((m) => ({ id: makeId(), type: "user", text: m.content as string }));
-        const restored: Block[] =
-          userBlocks.length > 0
-            ? userBlocks
-            : [{ id: makeId(), type: "user", text: (site?.prompt as string) ?? "" }];
 
         setPrompt((site?.prompt as string) ?? "");
         setSiteName((site?.name as string) ?? "Sayt");
         setSiteId(id);
         setFiles(projectFiles);
         setActiveFile(projectFiles[0]?.path ?? null);
-        setBlocks([
-          ...restored,
-          {
-            id: makeId(),
-            type: "build",
-            name: (site?.name as string) ?? "",
-            files: toFileChanges(projectFiles, new Set()),
-            revealed: projectFiles.length,
-            done: true,
-          },
-        ]);
-        setPhase("built");
+
+        // Prefer the full saved conversation (cross-device, identical on every
+        // device). Fall back to a minimal thread rebuilt from stored user messages.
+        const convo = site?.conversation as { blocks?: Block[]; phase?: Phase } | null;
+        if (convo && Array.isArray(convo.blocks) && convo.blocks.length > 0) {
+          setBlocks(normalizeBlocks(convo.blocks));
+          setPhase(clampPhase(convo.phase));
+        } else {
+          const { data: msgs } = await supabase
+            .from("messages")
+            .select("role,content,created_at")
+            .eq("site_id", id)
+            .order("created_at", { ascending: true });
+          const userBlocks: Block[] = (msgs ?? [])
+            .filter((m) => m.role === "user")
+            .map((m) => ({ id: makeId(), type: "user", text: m.content as string }));
+          const restored: Block[] =
+            userBlocks.length > 0
+              ? userBlocks
+              : [{ id: makeId(), type: "user", text: (site?.prompt as string) ?? "" }];
+          setBlocks([
+            ...restored,
+            {
+              id: makeId(),
+              type: "build",
+              name: (site?.name as string) ?? "",
+              files: toFileChanges(projectFiles, new Set()),
+              revealed: projectFiles.length,
+              done: true,
+            },
+          ]);
+          setPhase("built");
+        }
+        // The DB copy is authoritative here — safe to start mirroring edits.
+        convoSyncedRef.current = true;
       } catch {
         router.replace("/workspace");
       } finally {
@@ -438,6 +470,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
         clearSession();
         window.history.replaceState(null, "", "/workspace/build");
         ready.current = true;
+        convoSyncedRef.current = true;
         void startFromPrompt(tpl.prompt);
         return;
       }
@@ -448,6 +481,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       window.sessionStorage.removeItem(PROMPT_STORAGE_KEY);
       clearSession();
       ready.current = true;
+      convoSyncedRef.current = true;
       void startFromPrompt(fresh);
       return;
     }
@@ -469,39 +503,61 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       setSiteId(saved.siteId);
 
       // Normalize transient running states so nothing looks stuck.
-      const normalized: Block[] = saved.blocks.map((b) => {
-        if (b.type === "thinking") return { ...b, activeIndex: -1 };
-        if (b.type === "build" || b.type === "edit")
-          return { ...b, revealed: b.files.length, done: true };
-        return b;
-      });
+      const normalized: Block[] = normalizeBlocks(saved.blocks);
 
       if (saved.phase === "thinking") {
         // The plan call was lost mid-flight — re-run it from the prompt.
         setBlocks(normalized.filter((b) => b.type !== "thinking"));
         ready.current = true;
+        convoSyncedRef.current = true;
         void continuePlan(saved.prompt);
         return;
       }
       if (saved.phase === "building") {
         setBlocks(normalized);
         ready.current = true;
+        convoSyncedRef.current = true;
         void recoverBuild(saved);
         return;
       }
 
+      // Show the local thread immediately, then reconcile with the DB copy and
+      // prefer whichever is newer — so another device's edits are never lost or
+      // overwritten. DB writes stay gated until this finishes.
       setBlocks(normalized);
-      setPhase(saved.phase);
+      setPhase(clampPhase(saved.phase));
       setBusy(false);
       ready.current = true;
       if (saved.siteId) {
+        const sid = saved.siteId;
         void (async () => {
-          const projectFiles = await fetchFiles(createClient(), saved.siteId as string);
+          const projectFiles = await fetchFiles(createClient(), sid);
           if (projectFiles.length > 0) {
             setFiles(projectFiles);
             setActiveFile((prev) => prev ?? projectFiles[0]?.path ?? null);
           }
+          try {
+            const res = await fetch(`/api/sites/conversation?siteId=${sid}`);
+            const data = await res.json();
+            const dbConvo = data?.conversation as
+              | { blocks?: Block[]; phase?: Phase; updatedAt?: number }
+              | null;
+            if (
+              dbConvo &&
+              Array.isArray(dbConvo.blocks) &&
+              dbConvo.blocks.length > 0 &&
+              (dbConvo.updatedAt ?? 0) > (saved.updatedAt ?? 0)
+            ) {
+              setBlocks(normalizeBlocks(dbConvo.blocks));
+              setPhase(clampPhase(dbConvo.phase));
+            }
+          } catch {
+            /* offline or no DB copy — keep the local thread */
+          }
+          convoSyncedRef.current = true;
         })();
+      } else {
+        convoSyncedRef.current = true;
       }
       return;
     }
@@ -523,8 +579,29 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       docs,
       activeFile,
       buildStartedAt: buildStartedAt.current ?? undefined,
+      updatedAt: Date.now(),
     });
   }, [prompt, blocks, phase, siteId, siteName, logoUrl, docs, activeFile]);
+
+  // ── Mirror the full conversation to the DB so every device restores it ──
+  // Debounced; only settled, non-busy states, and only after the shown thread has
+  // been reconciled with the DB (so a stale local copy can't clobber a newer one).
+  const convoTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(() => {
+    if (!ready.current || !convoSyncedRef.current || !siteId || blocks.length === 0) return;
+    if (busy || phase === "thinking" || phase === "building") return;
+    if (convoTimer.current) clearTimeout(convoTimer.current);
+    convoTimer.current = setTimeout(() => {
+      fetch("/api/sites/conversation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId, blocks, phase, updatedAt: Date.now() }),
+      }).catch(() => {});
+    }, 1200);
+    return () => {
+      if (convoTimer.current) clearTimeout(convoTimer.current);
+    };
+  }, [blocks, phase, siteId, busy]);
 
   // ── Auto-scroll the agent panel ──
   React.useEffect(() => {

@@ -99,6 +99,16 @@ export function WebContainerPreview({
   const [errorMsg, setErrorMsg] = React.useState("");
   const [url, setUrl] = React.useState<string | null>(null);
   const filesRef = React.useRef<ProjectFile[]>(files);
+  // Bumped after an edit to force a fresh preview load (HMR alone can miss
+  // structural changes like new pages/routes).
+  const [reloadKey, setReloadKey] = React.useState(0);
+  const reloadTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(
+    () => () => {
+      if (reloadTimer.current) clearTimeout(reloadTimer.current);
+    },
+    [],
+  );
 
   // Keep the latest error callback + a reset-able "last reported" guard in refs.
   const onBuildErrorRef = React.useRef(onBuildError);
@@ -215,7 +225,13 @@ export function WebContainerPreview({
           await container.fs.writeFile(file.path, file.content);
         }
         // Allow a persistent error to re-report after a fix/edit recompiles.
-        if (changed) lastReportedRef.current = "";
+        if (changed) {
+          lastReportedRef.current = "";
+          // Force a fresh load shortly after the writes land so the new content
+          // is guaranteed to show (HMR can miss new pages / routing changes).
+          if (reloadTimer.current) clearTimeout(reloadTimer.current);
+          reloadTimer.current = setTimeout(() => setReloadKey((k) => k + 1), 450);
+        }
       } catch {
         /* HMR write failed — preview will catch up on next edit */
       }
@@ -265,7 +281,7 @@ export function WebContainerPreview({
         {url ? (
           <iframe
             ref={iframeRef}
-            src={url}
+            src={reloadKey > 0 ? `${url}${url.includes("?") ? "&" : "?"}__r=${reloadKey}` : url}
             title="Sayt önizləməsi"
             className="h-full w-full bg-white"
             allow="cross-origin-isolated"

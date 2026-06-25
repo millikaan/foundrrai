@@ -44,6 +44,8 @@ export interface BuildSession {
   activeFile: string | null;
   /** Set while a build request is in flight, so a refresh can try to recover it. */
   buildStartedAt?: number;
+  /** Wall-clock of the last local change — used to reconcile against the DB copy. */
+  updatedAt?: number;
 }
 
 const SESSION_KEY = "foundrr:build-session";
