@@ -7,11 +7,13 @@ import {
   ArrowUp,
   BookOpen,
   Check,
+  Coins,
   Eye,
   FileText,
   History,
   Loader2,
   MessageCircle,
+  MoreHorizontal,
   Plus,
   Sparkles,
   X,
@@ -110,6 +112,27 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const [mode, setMode] = React.useState<"agent" | "chat">("agent");
   const [knowledge, setKnowledge] = React.useState("");
   const [knowledgeOpen, setKnowledgeOpen] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  // Close the header overflow menu on outside-click / Escape.
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   /** Restore the live project to a previous checkpoint's file tree. */
   const restoreCheckpoint = (restored: ProjectFile[]) => {
@@ -781,36 +804,89 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
         <header className="flex h-14 items-center justify-between border-b border-border px-4">
           <button
             onClick={() => router.push("/workspace")}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            title="Saytlarıma qayıt"
+            aria-label="Saytlarıma qayıt"
+            className="group inline-flex items-center rounded-full p-1 transition-colors"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="brand-mark h-5 w-5 rounded-[6px]" />
-            Foundrr
-          </button>
-          <div className="flex items-center gap-2">
-            {siteId ? (
-              <button
-                onClick={() => setKnowledgeOpen(true)}
-                title="Layihə biliyi"
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <BookOpen className="h-3.5 w-3.5" />
-                Bilik
-              </button>
-            ) : null}
-            {phase === "built" && siteId ? (
-              <button
-                onClick={() => setVersionsOpen(true)}
-                title="Versiyalar"
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <History className="h-3.5 w-3.5" />
-                Versiyalar
-              </button>
-            ) : null}
-            <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
-              {credits} kredit
+            <span className="relative flex h-6 w-6 items-center justify-center">
+              <span className="brand-mark absolute inset-0 rounded-[7px] transition-opacity group-hover:opacity-0" />
+              <ArrowLeft className="relative h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             </span>
+          </button>
+
+          <div className="flex items-center gap-2">
+            <span
+              title={`${credits} kredit qalıb`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground"
+            >
+              <Coins className="h-3.5 w-3.5 text-primary" />
+              <span className="font-mono tabular-nums text-foreground">{credits}</span>
+              kredit
+            </span>
+
+            {siteId ? (
+              <div ref={menuRef} className="relative">
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  title="Daha çox"
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground",
+                    menuOpen && "bg-muted text-foreground",
+                  )}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
+
+                {menuOpen ? (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-10 z-50 w-48 overflow-hidden rounded-2xl border border-border bg-card p-1.5 shadow-[0_24px_60px_-30px_hsl(240_22%_13%/0.5)]"
+                  >
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setKnowledgeOpen(true);
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13px] font-medium text-foreground transition-colors hover:bg-muted"
+                    >
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <BookOpen className="h-4 w-4" />
+                      </span>
+                      <span className="flex flex-col">
+                        Bilik
+                        <span className="text-[11px] font-normal text-muted-foreground">
+                          Layihə təlimatları
+                        </span>
+                      </span>
+                    </button>
+
+                    {phase === "built" ? (
+                      <button
+                        role="menuitem"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setVersionsOpen(true);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-[13px] font-medium text-foreground transition-colors hover:bg-muted"
+                      >
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <History className="h-4 w-4" />
+                        </span>
+                        <span className="flex flex-col">
+                          Versiyalar
+                          <span className="text-[11px] font-normal text-muted-foreground">
+                            Əvvəlki nüsxələr
+                          </span>
+                        </span>
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </header>
 
