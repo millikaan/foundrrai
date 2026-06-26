@@ -91,7 +91,7 @@ export function PublishPanel({ open, onClose, siteId, siteName, plan }: PublishP
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative w-full max-w-[480px] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_40px_120px_-30px_hsl(240_22%_13%/0.5)]">
+      <div className="relative flex max-h-[90vh] w-full max-w-[520px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_40px_120px_-30px_hsl(240_22%_13%/0.5)]">
         <div className="bloom bloom-cta pointer-events-none absolute -top-10 right-0 -z-10 h-56 w-56 opacity-60" aria-hidden />
 
         <button
@@ -102,7 +102,7 @@ export function PublishPanel({ open, onClose, siteId, siteName, plan }: PublishP
           <X className="h-4.5 w-4.5" />
         </button>
 
-        <div className="p-7">
+        <div className="min-h-0 flex-1 overflow-y-auto p-7">
           {/* header */}
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
