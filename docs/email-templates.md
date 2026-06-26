@@ -24,7 +24,7 @@ the `{{ .ConfirmationURL }}` variable exactly as-is — Supabase fills it in.
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#ffffff;border:1px solid #efe9e1;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -34px rgba(40,28,20,0.20);">
 <tr><td style="height:6px;background-color:#7735e9;background-image:linear-gradient(90deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></td></tr>
 <tr><td style="padding:34px 38px 0;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td style="vertical-align:middle;"><div style="width:36px;height:36px;border-radius:50%;background-color:#7735e9;background-image:linear-gradient(135deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></div></td>
+<td style="vertical-align:middle;"><img src="https://www.foundrr.online/logo.png" width="36" height="36" alt="Foundrr" style="display:block;width:36px;height:36px;border-radius:50%;" /></td>
 <td style="vertical-align:middle;padding-left:11px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;color:#1b1830;">Foundrr</td>
 </tr></table></td></tr>
 <tr><td style="padding:24px 38px 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
@@ -51,7 +51,7 @@ the `{{ .ConfirmationURL }}` variable exactly as-is — Supabase fills it in.
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#ffffff;border:1px solid #efe9e1;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -34px rgba(40,28,20,0.20);">
 <tr><td style="height:6px;background-color:#7735e9;background-image:linear-gradient(90deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></td></tr>
 <tr><td style="padding:34px 38px 0;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td style="vertical-align:middle;"><div style="width:36px;height:36px;border-radius:50%;background-color:#7735e9;background-image:linear-gradient(135deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></div></td>
+<td style="vertical-align:middle;"><img src="https://www.foundrr.online/logo.png" width="36" height="36" alt="Foundrr" style="display:block;width:36px;height:36px;border-radius:50%;" /></td>
 <td style="vertical-align:middle;padding-left:11px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;color:#1b1830;">Foundrr</td>
 </tr></table></td></tr>
 <tr><td style="padding:24px 38px 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
@@ -78,7 +78,7 @@ the `{{ .ConfirmationURL }}` variable exactly as-is — Supabase fills it in.
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#ffffff;border:1px solid #efe9e1;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -34px rgba(40,28,20,0.20);">
 <tr><td style="height:6px;background-color:#7735e9;background-image:linear-gradient(90deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></td></tr>
 <tr><td style="padding:34px 38px 0;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td style="vertical-align:middle;"><div style="width:36px;height:36px;border-radius:50%;background-color:#7735e9;background-image:linear-gradient(135deg,#3b6cff,#7735e9,#ff3da6,#ff8a3d);"></div></td>
+<td style="vertical-align:middle;"><img src="https://www.foundrr.online/logo.png" width="36" height="36" alt="Foundrr" style="display:block;width:36px;height:36px;border-radius:50%;" /></td>
 <td style="vertical-align:middle;padding-left:11px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;color:#1b1830;">Foundrr</td>
 </tr></table></td></tr>
 <tr><td style="padding:24px 38px 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">

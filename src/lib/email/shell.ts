@@ -61,7 +61,7 @@ export function emailShell(c: EmailContent): string {
         <tr><td style="height:6px;background-color:#7735e9;background-image:${GRADIENT};"></td></tr>
         <tr><td style="padding:34px 38px 0;">
           <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-            <td style="vertical-align:middle;"><div style="width:36px;height:36px;border-radius:50%;background-color:#7735e9;background-image:${GRADIENT};box-shadow:0 8px 20px -8px rgba(119,53,233,0.6);"></div></td>
+            <td style="vertical-align:middle;"><img src="${SITE_URL}/logo.png" width="36" height="36" alt="Foundrr" style="display:block;width:36px;height:36px;border-radius:50%;" /></td>
             <td style="vertical-align:middle;padding-left:11px;font-family:${FONT};font-size:18px;font-weight:700;letter-spacing:-0.01em;color:#1b1830;">Foundrr</td>
           </tr></table>
         </td></tr>
