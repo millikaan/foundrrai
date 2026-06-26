@@ -153,8 +153,10 @@ export function ProfileMenu({
             />
             <div
               className={cn(
-                "absolute z-50 w-60 overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-[0_20px_60px_-20px_hsl(240_22%_13%/0.35)]",
-                isSidebar ? "bottom-full left-0 mb-2" : "right-0 mt-2",
+                "dropdown-in absolute z-50 w-60 overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-[0_24px_70px_-22px_hsl(240_22%_13%/0.4)]",
+                isSidebar
+                  ? "bottom-full left-0 mb-2 origin-bottom-left"
+                  : "right-0 mt-2 origin-top-right",
               )}
             >
               <div className="flex items-center gap-2.5 px-2.5 py-2">
