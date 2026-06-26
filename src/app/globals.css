@@ -220,6 +220,25 @@
   }
 }
 
+/* Gentle left nudge for the "approve on the left" hint arrow. */
+@keyframes nudge-left {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+}
+.nudge-left {
+  animation: nudge-left 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nudge-left {
+    animation: none;
+  }
+}
+
 /* ---------- Entrance + reveal motion ---------- */
 @keyframes fade-up {
   from {
