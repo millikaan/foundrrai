@@ -79,6 +79,11 @@ export function SettingsModal({
   const [cancelling, setCancelling] = React.useState(false);
   const [cancelScheduled, setCancelScheduled] = React.useState<number | boolean | null>(null);
   const [syncing, setSyncing] = React.useState(false);
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [savingPassword, setSavingPassword] = React.useState(false);
+  const [passwordSaved, setPasswordSaved] = React.useState(false);
+  const [passwordError, setPasswordError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (open) setTab(initialTab);
@@ -181,6 +186,32 @@ export function SettingsModal({
       }
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const changePassword = async () => {
+    if (newPassword.length < 6) {
+      setPasswordError("Şifrə ən azı 6 simvol olmalıdır.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Şifrələr uyğun gəlmir.");
+      return;
+    }
+    setPasswordError(null);
+    setSavingPassword(true);
+    setPasswordSaved(false);
+    try {
+      const { error } = await createClient().auth.updateUser({ password: newPassword });
+      if (error) {
+        setPasswordError("Şifrə yenilənmədi. Yenidən daxil olub cəhd et.");
+        return;
+      }
+      setPasswordSaved(true);
+      setNewPassword("");
+      setConfirmPassword("");
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -313,6 +344,53 @@ export function SettingsModal({
               <p className="mt-1 text-[14px] text-muted-foreground">
                 Hesabın və seansın.
               </p>
+
+              <div className="mt-6 rounded-2xl border border-border p-4">
+                <p className="text-[14px] font-semibold">Şifrəni dəyiş</p>
+                <p className="mt-0.5 text-[12.5px] text-muted-foreground">
+                  Yeni şifrə təyin et — dərhal qüvvəyə minir.
+                </p>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Yeni şifrə (ən azı 6 simvol)"
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setPasswordSaved(false);
+                    setPasswordError(null);
+                  }}
+                  className="mt-3 h-10 w-full rounded-xl border border-border bg-background px-3 text-[14px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
+                />
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Yeni şifrəni təkrarla"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setPasswordSaved(false);
+                    setPasswordError(null);
+                  }}
+                  className="mt-2 h-10 w-full rounded-xl border border-border bg-background px-3 text-[14px] outline-none focus:border-[hsl(var(--ring)/0.5)]"
+                />
+                {passwordError ? (
+                  <p className="mt-2 text-[12.5px] text-destructive">{passwordError}</p>
+                ) : null}
+                <button
+                  onClick={changePassword}
+                  disabled={savingPassword || !newPassword || !confirmPassword}
+                  className="mt-3 inline-flex h-10 items-center gap-1.5 rounded-xl bg-foreground px-4 text-[14px] font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-40"
+                >
+                  {savingPassword ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : passwordSaved ? (
+                    <Check className="h-4 w-4" />
+                  ) : null}
+                  {passwordSaved ? "Yeniləndi" : "Şifrəni yenilə"}
+                </button>
+              </div>
+
               <button
                 onClick={onSignOut}
                 className="mt-7 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-[14px] font-medium text-foreground transition-colors hover:bg-muted"
