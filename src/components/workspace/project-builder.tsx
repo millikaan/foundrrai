@@ -148,6 +148,10 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
   const [docs, setDocs] = React.useState<{ name: string; content: string }[]>([]);
   const [attaching, setAttaching] = React.useState(false);
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+  // Undo / redo history of the file tree for visual edits (text/image/code/AI edit).
+  const [undoStack, setUndoStack] = React.useState<ProjectFile[][]>([]);
+  const [redoStack, setRedoStack] = React.useState<ProjectFile[][]>([]);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const refineRef = React.useRef<HTMLTextAreaElement>(null);
@@ -255,12 +259,35 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
     );
     const changed = next.filter((f, i) => f.content !== files[i]?.content);
     if (changed.length === 0) return false;
+    // Snapshot the pre-change tree so this visual edit can be undone.
+    setUndoStack((s) => [...s.slice(-29), files]);
+    setRedoStack([]);
     setFiles(next);
     changed.forEach((f) => persistFile(f.path, f.content));
     if (note) {
       setBlocks((prev) => [...prev, { id: makeId(), type: "note", text: note, tone: "ok" }]);
     }
     return true;
+  };
+
+  /** Undo / redo the last visual edit (text or image replacement). */
+  const undoEdit = () => {
+    if (undoStack.length === 0) return;
+    const prev = undoStack[undoStack.length - 1];
+    setUndoStack((s) => s.slice(0, -1));
+    setRedoStack((r) => [...r, files]);
+    setFiles(prev);
+    setActiveFile((a) => (prev.some((f) => f.path === a) ? a : (prev[0]?.path ?? null)));
+    prev.forEach((f) => persistFile(f.path, f.content));
+  };
+  const redoEdit = () => {
+    if (redoStack.length === 0) return;
+    const next = redoStack[redoStack.length - 1];
+    setRedoStack((r) => r.slice(0, -1));
+    setUndoStack((u) => [...u, files]);
+    setFiles(next);
+    setActiveFile((a) => (next.some((f) => f.path === a) ? a : (next[0]?.path ?? null)));
+    next.forEach((f) => persistFile(f.path, f.content));
   };
 
   /** Inline visual text edit (#5) — replace exact copy across the project (free). */
@@ -307,7 +334,9 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
 
     const noteId = makeId();
     setBlocks((prev) => [...prev, { id: noteId, type: "note", text: "Şəkil yüklənir…", tone: "ok" }]);
+    setUploadingImage(true);
     const url = await uploadImageFile(file);
+    setUploadingImage(false);
     if (!url) {
       patchBlock(noteId, (b) =>
         b.type === "note" ? { ...b, text: "Şəkil yüklənmədi.", tone: "err" } : b,
@@ -1240,6 +1269,11 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
           onChangeFile={editFileContent}
           onTextReplace={applyTextReplace}
           onImageReplace={onImageReplace}
+          uploadingImage={uploadingImage}
+          onUndo={undoEdit}
+          onRedo={redoEdit}
+          canUndo={undoStack.length > 0}
+          canRedo={redoStack.length > 0}
         />
       </div>
 

@@ -71,6 +71,8 @@ interface WebContainerPreviewProps {
   reloadSignal?: number;
   /** Reports the live preview URL (for the "open in new tab" button). */
   onUrl?: (url: string) => void;
+  /** Shows an "uploading image" overlay while a replacement picture uploads. */
+  uploading?: boolean;
 }
 
 export function WebContainerPreview({
@@ -86,6 +88,7 @@ export function WebContainerPreview({
   onImagePick,
   reloadSignal,
   onUrl,
+  uploading,
 }: WebContainerPreviewProps) {
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const onPickRef = React.useRef(onPick);
@@ -339,7 +342,7 @@ export function WebContainerPreview({
           />
         ) : null}
 
-        {selecting || editingText || editingImage ? (
+        {(selecting || editingText || editingImage) && !uploading ? (
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-3">
             <span className="rounded-full bg-foreground/90 px-3 py-1.5 text-[12px] font-medium text-background shadow-lg backdrop-blur">
               {editingImage
@@ -348,6 +351,15 @@ export function WebContainerPreview({
                   ? "Mətnə toxun, yaz, Enter ilə yadda saxla"
                   : "Dəyişmək istədiyin hissəyə toxun"}
             </span>
+          </div>
+        ) : null}
+
+        {uploading ? (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-foreground/30 backdrop-blur-sm">
+            <div className="flex items-center gap-2.5 rounded-2xl bg-card px-5 py-3.5 shadow-[0_24px_60px_-24px_hsl(240_22%_13%/0.5)]">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <span className="text-[13px] font-medium">Şəkil yüklənir…</span>
+            </div>
           </div>
         ) : null}
 

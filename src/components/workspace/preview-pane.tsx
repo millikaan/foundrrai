@@ -9,10 +9,12 @@ import {
   ImageIcon,
   Monitor,
   MousePointerClick,
+  Redo2,
   Rocket,
   RotateCw,
   Smartphone,
   Type,
+  Undo2,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -47,6 +49,12 @@ interface PreviewPaneProps {
   onTextReplace?: (oldText: string, newText: string) => void;
   /** Image clicked in the preview — upload a replacement and swap its src. */
   onImageReplace?: (oldSrc: string) => void;
+  /** True while a replacement picture uploads (shows an overlay in the preview). */
+  uploadingImage?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 function slugify(s: string): string {
@@ -72,6 +80,11 @@ export function PreviewPane({
   onChangeFile,
   onTextReplace,
   onImageReplace,
+  uploadingImage,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }: PreviewPaneProps) {
   const [tab, setTab] = React.useState<Tab>("preview");
   const [device, setDevice] = React.useState<Device>("desktop");
@@ -102,6 +115,22 @@ export function PreviewPane({
 
             {tab === "preview" ? (
               <>
+                {/* undo / redo */}
+                <div className="hidden shrink-0 items-center rounded-xl border border-border bg-card p-0.5 sm:flex">
+                  <ToolButton
+                    onClick={() => onUndo?.()}
+                    disabled={!canUndo}
+                    label="Geri al"
+                    icon={Undo2}
+                  />
+                  <ToolButton
+                    onClick={() => onRedo?.()}
+                    disabled={!canRedo}
+                    label="İrəli"
+                    icon={Redo2}
+                  />
+                </div>
+
                 {/* address bar */}
                 <button
                   onClick={() => setReloadSignal((s) => s + 1)}
@@ -218,6 +247,7 @@ export function PreviewPane({
                 onImagePick={({ src }) => onImageReplace?.(src)}
                 reloadSignal={reloadSignal}
                 onUrl={setPreviewUrl}
+                uploading={uploadingImage}
               />
             </div>
             <div className={cn("absolute inset-0", tab === "code" ? "z-10" : "hidden")}>
@@ -263,26 +293,29 @@ function TabButton({
 
 /** Active visual-edit tool — highlighted in the accent colour. */
 function ToolButton({
-  active,
+  active = false,
   onClick,
   label,
   icon: Icon,
+  disabled = false,
 }: {
-  active: boolean;
+  active?: boolean;
   onClick: () => void;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       aria-label={label}
       title={label}
       className={cn(
-        "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+        "flex h-8 w-8 items-center justify-center rounded-lg transition-colors disabled:opacity-30",
         active
           ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:text-foreground",
+          : "text-muted-foreground hover:text-foreground disabled:hover:text-muted-foreground",
       )}
     >
       <Icon className="h-4 w-4" />
