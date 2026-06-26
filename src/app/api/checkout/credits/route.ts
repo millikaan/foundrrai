@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { STRIPE_CURRENCY, getCreditPack } from "@/lib/stripe/plans";
+import { STRIPE_CURRENCY, getCreditPack, isPaidPlan } from "@/lib/stripe/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -42,10 +42,10 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
-  // Top-ups are a Pro perk.
-  if (profile?.plan !== "pro") {
+  // Top-ups are for any paid plan (Pro or Max).
+  if (!isPaidPlan(profile?.plan)) {
     return NextResponse.json(
-      { error: "Kredit paketləri yalnız Pro planında mövcuddur." },
+      { error: "Kredit paketləri yalnız ödənişli planlarda mövcuddur." },
       { status: 403 },
     );
   }

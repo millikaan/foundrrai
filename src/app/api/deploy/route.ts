@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getConnection } from "@/lib/connections";
+import { getConnection, getFreshSupabaseToken } from "@/lib/connections";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -121,8 +121,10 @@ export async function POST(request: Request) {
 
   // ── Optional: push the database schema to the user's own Supabase + inject keys ──
   const env: Record<string, string> = {};
-  const supa = await getConnection(supabase, user.id, "supabase");
-  const ref = supa?.meta?.ref as string | undefined;
+  // Refresh the Management-API token first — the OAuth access token expires ~1h
+  // after connecting, which would otherwise silently break the DB wiring.
+  const supa = await getFreshSupabaseToken(supabase, user.id);
+  const ref = supa?.ref;
   if (supa && ref) {
     try {
       // Always ensure the leads table, then run the app's own backend schema if any.

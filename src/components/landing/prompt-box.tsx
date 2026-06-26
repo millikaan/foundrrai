@@ -77,7 +77,11 @@ export function PromptBox({
 
   const submit = React.useCallback(() => {
     if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(PROMPT_STORAGE_KEY, value.trim());
+      const trimmed = value.trim();
+      window.sessionStorage.setItem(PROMPT_STORAGE_KEY, trimmed);
+      // Also a short-lived cookie: an email magic-link opens a NEW tab, where
+      // sessionStorage (per-tab) is empty — the cookie carries the idea across.
+      document.cookie = `foundrr_prompt=${encodeURIComponent(trimmed)}; path=/; max-age=1800; samesite=lax`;
     }
     router.push("/signup?intent=build");
   }, [router, value]);

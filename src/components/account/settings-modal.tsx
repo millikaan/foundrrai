@@ -415,15 +415,15 @@ function PlanTab({
         ))}
       </div>
 
-      {/* Pro-only: buy more credits */}
-      {plan === "pro" ? (
+      {/* Paid plans (Pro + Max): buy more credits */}
+      {plan !== "free" ? (
         <div className="mt-7">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-primary" />
             <h3 className="text-[15px] font-semibold">Əlavə kredit al</h3>
           </div>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Krediti bitəndə anında doldur — bu paketlər yalnız Pro üçündür.
+            Krediti bitəndə anında doldur — bu paketlər ödənişli planlar üçündür.
           </p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {CREDIT_PACKS.map((pack) => (

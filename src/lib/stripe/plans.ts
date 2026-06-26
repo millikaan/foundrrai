@@ -1,9 +1,10 @@
 /**
  * Paid plan configuration for Stripe checkout + the upgrade credit grant.
  *
- * `amount` is in the currency's smallest unit (e.g. cents). Prices are shown in
- * ₼ in the UI; set STRIPE_CURRENCY (+ amounts) to whatever your Stripe account
- * supports — note AZN may not be available, so this defaults to USD.
+ * `amount` is in the currency's smallest unit (e.g. qəpik). Prices are shown in ₼
+ * in the UI, so the charge currency defaults to AZN to match. The real charge uses
+ * the Stripe catalog price IDs (already AZN) when set; this only affects the
+ * price_data fallback. Override with STRIPE_CURRENCY if your account needs another.
  */
 export type PaidPlan = "pro" | "max";
 
@@ -25,7 +26,7 @@ export const PLAN_CONFIG: Record<
   },
 };
 
-export const STRIPE_CURRENCY = process.env.STRIPE_CURRENCY ?? "usd";
+export const STRIPE_CURRENCY = process.env.STRIPE_CURRENCY ?? "azn";
 
 export function isPaidPlan(value: unknown): value is PaidPlan {
   return value === "pro" || value === "max";

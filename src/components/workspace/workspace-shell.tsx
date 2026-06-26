@@ -51,13 +51,22 @@ const STATUS_LABEL: Record<string, string> = {
   deployed: "Yayımlandı",
 };
 
+/** Read + clear the cross-tab prompt cookie set by the landing prompt box (so an
+ *  email magic-link, which opens a fresh tab, still restores the typed idea). */
+function readPromptCookie(): string | null {
+  const m = document.cookie.match(/(?:^|;\s*)foundrr_prompt=([^;]*)/);
+  if (!m) return null;
+  document.cookie = "foundrr_prompt=; path=/; max-age=0; samesite=lax";
+  return decodeURIComponent(m[1]);
+}
+
 export function WorkspaceShell({ name, email, credits, plan, sites }: WorkspaceShellProps) {
   const router = useRouter();
   const [value, setValue] = React.useState("");
   const [greeting, setGreeting] = React.useState(`Vaxtdır, ${name}`);
 
   React.useEffect(() => {
-    const stored = window.sessionStorage.getItem(PROMPT_STORAGE_KEY);
+    const stored = window.sessionStorage.getItem(PROMPT_STORAGE_KEY) ?? readPromptCookie();
     if (stored) setValue(stored);
     setGreeting(greetingFor(name));
   }, [name]);

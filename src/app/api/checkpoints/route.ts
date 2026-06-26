@@ -70,26 +70,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Tapılmadı." }, { status: 404 });
   }
 
-  const { data: checkpoint } = await supabase
-    .from("checkpoints")
-    .select("files")
-    .eq("id", checkpointId)
-    .eq("site_id", siteId)
-    .single();
-  const files = (checkpoint?.files as ProjectFile[] | null) ?? null;
+  // Atomic restore — the RPC deletes + reinserts the snapshot in ONE transaction,
+  // so a mid-restore failure rolls back and the original tree is never lost.
+  const { data, error } = await supabase.rpc("restore_checkpoint", {
+    p_site_id: siteId,
+    p_checkpoint_id: checkpointId,
+  });
+  if (error) {
+    return NextResponse.json({ error: "Bərpa alınmadı." }, { status: 500 });
+  }
+  const files = (data as ProjectFile[] | null) ?? null;
   if (!files || files.length === 0) {
     return NextResponse.json({ error: "Versiya boşdur." }, { status: 400 });
-  }
-
-  // Replace the current tree with the snapshot.
-  await supabase.from("files").delete().eq("site_id", siteId);
-  for (const file of files) {
-    await supabase
-      .from("files")
-      .upsert(
-        { site_id: siteId, path: file.path, content: file.content },
-        { onConflict: "site_id,path" },
-      );
   }
 
   return NextResponse.json({ files });
