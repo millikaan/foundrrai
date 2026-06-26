@@ -128,6 +128,8 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   const fixingRef = React.useRef(false);
   const fixAttemptsRef = React.useRef(0);
   const fixGaveUpRef = React.useRef(false);
+  // Synchronous guard so a fast double-click can't fire two builds (= double charge).
+  const approvingRef = React.useRef(false);
   const [publishOpen, setPublishOpen] = React.useState(false);
   const [versionsOpen, setVersionsOpen] = React.useState(false);
   const [mobileView, setMobileView] = React.useState<"chat" | "preview">("chat");
@@ -662,7 +664,8 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
   };
 
   const approve = async () => {
-    if (busy) return;
+    if (busy || approvingRef.current) return;
+    approvingRef.current = true;
     setBusy(true);
     fixAttemptsRef.current = 0;
     fixGaveUpRef.current = false;
@@ -701,6 +704,7 @@ export function ProjectBuilder({ credits: initialCredits }: { credits: number })
       setPhase("plan");
     } finally {
       setBusy(false);
+      approvingRef.current = false;
     }
   };
 

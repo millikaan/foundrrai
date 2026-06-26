@@ -4,7 +4,14 @@ import { Bloom } from "@/components/landing/bloom";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function resolveNext(value: string | string[] | undefined): string {
-  if (typeof value === "string" && value.startsWith("/")) return value;
+  if (
+    typeof value === "string" &&
+    value.startsWith("/") &&
+    !value.startsWith("//") &&
+    !value.startsWith("/\\")
+  ) {
+    return value;
+  }
   return "/workspace";
 }
 

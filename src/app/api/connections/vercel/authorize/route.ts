@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { makeState, stateCookieName } from "@/lib/oauth-state";
+
 export const runtime = "nodejs";
 
 /**
@@ -15,5 +17,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/workspace?connect=vercel_unconfigured`);
   }
 
-  return NextResponse.redirect(`https://vercel.com/integrations/${slug}/new`);
+  const state = makeState();
+  const res = NextResponse.redirect(`https://vercel.com/integrations/${slug}/new?state=${state}`);
+  res.cookies.set(stateCookieName("vercel"), state, {
+    httpOnly: true,
+    secure: new URL(request.url).protocol === "https:",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+  return res;
 }

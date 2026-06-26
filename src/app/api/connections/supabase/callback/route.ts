@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { encryptToken } from "@/lib/crypto";
+import { stateCookieName, validateState } from "@/lib/oauth-state";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -12,6 +14,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const returnedState = searchParams.get("state");
 
   const fail = (reason: string) =>
     NextResponse.redirect(
@@ -19,6 +22,12 @@ export async function GET(request: Request) {
     );
 
   if (!code) return fail("no_code");
+
+  // CSRF: the returned state must match the cookie set at authorize time.
+  const cookieStore = await cookies();
+  if (!validateState(cookieStore.get(stateCookieName("supabase"))?.value, returnedState)) {
+    return fail("state");
+  }
 
   const clientId = process.env.FOUNDRR_SUPABASE_CLIENT_ID;
   const clientSecret = process.env.FOUNDRR_SUPABASE_CLIENT_SECRET;
@@ -77,7 +86,8 @@ export async function GET(request: Request) {
     owner_id: user.id,
     provider: "supabase",
     token_encrypted: encryptToken(accessToken),
-    meta: { ref, refreshToken },
+    // Encrypt the long-lived refresh token too — never store secrets in cleartext.
+    meta: { ref, refreshToken: refreshToken ? encryptToken(refreshToken) : null },
   };
   const { data: existing } = await supabase
     .from("connections")

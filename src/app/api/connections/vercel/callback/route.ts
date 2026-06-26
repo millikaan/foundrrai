@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { encryptToken } from "@/lib/crypto";
+import { stateCookieName, validateState } from "@/lib/oauth-state";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -24,6 +26,16 @@ export async function GET(request: Request) {
     );
 
   if (!code) return fail("no_code");
+
+  // Best-effort CSRF: the Vercel integration install may not echo `state`, so
+  // only enforce when it does (never block a legitimate connect that omits it).
+  const returnedState = searchParams.get("state");
+  if (returnedState) {
+    const cookieStore = await cookies();
+    if (!validateState(cookieStore.get(stateCookieName("vercel"))?.value, returnedState)) {
+      return fail("state");
+    }
+  }
 
   const clientId = process.env.FOUNDRR_VERCEL_CLIENT_ID;
   const clientSecret = process.env.FOUNDRR_VERCEL_CLIENT_SECRET;

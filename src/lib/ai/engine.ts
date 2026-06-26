@@ -1,6 +1,8 @@
 /** Foundrr generation engine config + prompts (runs on OpenAI). */
 
-export const CREDIT_COSTS = { plan: 5, build: 85, edit: 12, fix: 5, chat: 1 } as const;
+// `fix` is the automatic build-error self-heal — it is FREE (the UI says so);
+// keep it at 0 so the bounded auto-retry loop never silently spends credits.
+export const CREDIT_COSTS = { plan: 5, build: 85, edit: 12, fix: 0, chat: 1 } as const;
 export type GenerateMode = keyof typeof CREDIT_COSTS;
 
 /**

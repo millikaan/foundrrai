@@ -24,9 +24,11 @@ export async function GET() {
     return NextResponse.json({ error: "Daxil olmaq lazımdır." }, { status: 401 });
   }
 
+  // Return ONLY the provider name — never meta (which can carry secrets like an
+  // encrypted/raw refresh token). The UI only needs to know what's connected.
   const { data } = await supabase
     .from("connections")
-    .select("provider, meta")
+    .select("provider")
     .eq("owner_id", user.id);
 
   return NextResponse.json({ connections: data ?? [] });

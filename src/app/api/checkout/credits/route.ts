@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { STRIPE_CURRENCY, getCreditPack } from "@/lib/stripe/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -53,9 +54,11 @@ export async function POST(request: Request) {
 
   // ── Fallback: no Stripe → grant immediately ──
   if (!secret) {
-    const credits = (profile?.credits ?? 0) + pack.credits;
-    await supabase.from("profiles").update({ credits }).eq("id", user.id);
-    return NextResponse.json({ simulated: true, credits });
+    const { data: credits } = await createAdminClient().rpc("increment_credits", {
+      p_user: user.id,
+      p_delta: pack.credits,
+    });
+    return NextResponse.json({ simulated: true, credits: credits ?? 0 });
   }
 
   // ── Real Stripe one-time Checkout ──

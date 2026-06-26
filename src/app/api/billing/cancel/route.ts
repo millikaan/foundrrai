@@ -77,8 +77,14 @@ export async function POST() {
           credits: profile.credits ?? 0,
         });
       }
+      // Stripe responded but found no subscription → genuine simulated case;
+      // fall through to the immediate downgrade below.
     } catch {
-      // Fall through to the simulated downgrade below.
+      // Transient Stripe error — do NOT downgrade a live paying subscriber.
+      return NextResponse.json(
+        { error: "Stripe ilə əlaqə alınmadı. Bir azdan yenidən yoxla." },
+        { status: 502 },
+      );
     }
   }
 

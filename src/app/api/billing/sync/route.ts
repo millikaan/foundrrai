@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { PLAN_CONFIG, isPaidPlan } from "@/lib/stripe/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -59,7 +60,13 @@ export async function POST() {
     return NextResponse.json({ changed: false, plan: currentPlan, credits: currentCredits });
   }
 
-  const credits = currentCredits + PLAN_CONFIG[targetPlan].credits;
-  await supabase.from("profiles").update({ plan: targetPlan, credits }).eq("id", user.id);
-  return NextResponse.json({ changed: true, plan: targetPlan, credits });
+  // Atomic grant (admin RPC); the plan guard above prevents repeat grants, and the
+  // webhook skips the grant when the plan already matches — so they can't stack.
+  const admin = createAdminClient();
+  const { data: credits } = await admin.rpc("increment_credits", {
+    p_user: user.id,
+    p_delta: PLAN_CONFIG[targetPlan].credits,
+  });
+  await admin.from("profiles").update({ plan: targetPlan }).eq("id", user.id);
+  return NextResponse.json({ changed: true, plan: targetPlan, credits: credits ?? currentCredits });
 }

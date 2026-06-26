@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { encryptToken } from "@/lib/crypto";
+import { stateCookieName, validateState } from "@/lib/oauth-state";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -12,6 +14,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const returnedState = searchParams.get("state");
 
   const fail = (reason: string, detail?: string) =>
     NextResponse.redirect(
@@ -20,6 +23,12 @@ export async function GET(request: Request) {
     );
 
   if (!code) return fail("no_code");
+
+  // CSRF: the returned state must match the cookie set at authorize time.
+  const cookieStore = await cookies();
+  if (!validateState(cookieStore.get(stateCookieName("github"))?.value, returnedState)) {
+    return fail("state");
+  }
 
   const clientId = process.env.FOUNDRR_GITHUB_CLIENT_ID;
   const clientSecret = process.env.FOUNDRR_GITHUB_CLIENT_SECRET;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { PLAN_CONFIG, STRIPE_CURRENCY, isPaidPlan } from "@/lib/stripe/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -39,14 +40,13 @@ export async function POST(request: Request) {
 
   // ── Fallback: no Stripe configured → simulated upgrade ──
   if (!secret) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("credits")
-      .eq("id", user.id)
-      .single();
-    const credits = (profile?.credits ?? 0) + config.credits;
-    await supabase.from("profiles").update({ plan, credits }).eq("id", user.id);
-    return NextResponse.json({ simulated: true, plan, credits });
+    const admin = createAdminClient();
+    const { data: credits } = await admin.rpc("increment_credits", {
+      p_user: user.id,
+      p_delta: config.credits,
+    });
+    await admin.from("profiles").update({ plan }).eq("id", user.id);
+    return NextResponse.json({ simulated: true, plan, credits: credits ?? 0 });
   }
 
   // ── Real Stripe Checkout ──
@@ -74,6 +74,9 @@ export async function POST(request: Request) {
       success_url: `${origin}/workspace?upgraded=${plan}`,
       cancel_url: `${origin}/workspace`,
       metadata: { userId: user.id, plan },
+      // Carry the identity onto the subscription too, so cancellation
+      // (customer.subscription.deleted) can downgrade the right user.
+      subscription_data: { metadata: { userId: user.id, plan } },
     });
     return NextResponse.json({ url: session.url });
   } catch {

@@ -33,56 +33,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "İmza doğrulanmadı." }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as {
-      metadata?: { userId?: string; plan?: string; type?: string; credits?: string };
-    };
-    const userId = session.metadata?.userId;
-    const type = session.metadata?.type;
-    const plan = session.metadata?.plan;
+  const admin = createAdminClient();
 
-    try {
-      const admin = createAdminClient();
+  // Idempotency: process each Stripe event at most once (the PK conflict means
+  // we've already handled it — so retries can't double-grant credits).
+  const { error: dupError } = await admin.from("stripe_events").insert({ id: event.id });
+  if (dupError) {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as {
+        metadata?: { userId?: string; plan?: string; type?: string; credits?: string };
+      };
+      const userId = session.metadata?.userId;
+      const type = session.metadata?.type;
+      const plan = session.metadata?.plan;
 
       if (userId && type === "credits") {
         // One-time credit top-up: add credits, keep the plan.
         const add = Number.parseInt(session.metadata?.credits ?? "0", 10);
         if (add > 0) {
-          const { data: profile } = await admin
-            .from("profiles")
-            .select("credits")
-            .eq("id", userId)
-            .single();
-          const credits = (profile?.credits ?? 0) + add;
-          await admin.from("profiles").update({ credits }).eq("id", userId);
+          await admin.rpc("increment_credits", { p_user: userId, p_delta: add });
         }
       } else if (userId && isPaidPlan(plan)) {
-        // Subscription upgrade: grant the plan + its monthly credits.
+        // Subscription upgrade: grant the monthly credits ONLY if not already on
+        // this plan, so the webhook + /api/billing/sync can never double-grant.
         const { data: profile } = await admin
           .from("profiles")
-          .select("credits")
+          .select("plan")
           .eq("id", userId)
           .single();
-        const credits = (profile?.credits ?? 0) + PLAN_CONFIG[plan].credits;
-        await admin.from("profiles").update({ plan, credits }).eq("id", userId);
+        if (profile?.plan !== plan) {
+          await admin.rpc("increment_credits", { p_user: userId, p_delta: PLAN_CONFIG[plan].credits });
+        }
+        await admin.from("profiles").update({ plan }).eq("id", userId);
       }
-    } catch {
-      return NextResponse.json({ error: "Profil yenilənmədi." }, { status: 500 });
-    }
-  }
-
-  // A subscription ending (cancellation, payment failure) → drop to Free.
-  if (event.type === "customer.subscription.deleted") {
-    const sub = event.data.object as { metadata?: { userId?: string } };
-    const userId = sub.metadata?.userId;
-    if (userId) {
-      try {
-        const admin = createAdminClient();
+    } else if (event.type === "customer.subscription.deleted") {
+      // A subscription ending (cancellation, payment failure) → drop to Free.
+      const sub = event.data.object as { metadata?: { userId?: string } };
+      const userId = sub.metadata?.userId;
+      if (userId) {
         await admin.from("profiles").update({ plan: "free" }).eq("id", userId);
-      } catch {
-        return NextResponse.json({ error: "Profil yenilənmədi." }, { status: 500 });
       }
     }
+  } catch {
+    // Let Stripe retry by clearing the idempotency marker for this event.
+    await admin.from("stripe_events").delete().eq("id", event.id);
+    return NextResponse.json({ error: "Profil yenilənmədi." }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

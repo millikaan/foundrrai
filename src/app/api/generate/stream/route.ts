@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 
 import { CHAT_STREAM_SYSTEM, CREDIT_COSTS, MODELS } from "@/lib/ai/engine";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -41,16 +42,26 @@ export async function POST(request: Request) {
     return Response.json({ error: "OPENAI_API_KEY konfiqurasiya olunmayıb." }, { status: 503 });
   }
 
+  // Atomically deduct the chat credit up-front; refund if the stream can't start.
   const cost = CREDIT_COSTS.chat;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("credits")
-    .eq("id", user.id)
-    .single();
-  const credits = profile?.credits ?? 0;
-  if (credits < cost) {
-    return Response.json({ error: "Kredit kifayət etmir.", credits }, { status: 402 });
+  const { data: deducted, error: deductError } = await supabase.rpc("deduct_credits", {
+    p_cost: cost,
+  });
+  if (deductError) {
+    return Response.json({ error: "Kredit yoxlanıla bilmədi." }, { status: 500 });
   }
+  if (deducted === null || deducted === undefined) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("credits")
+      .eq("id", user.id)
+      .single();
+    return Response.json(
+      { error: "Kredit kifayət etmir.", credits: profile?.credits ?? 0 },
+      { status: 402 },
+    );
+  }
+  const newCredits = deducted as number;
 
   const knowledge = (body.knowledge ?? "").trim();
   const userContent =
@@ -73,12 +84,13 @@ export async function POST(request: Request) {
       ],
     });
   } catch {
+    try {
+      await createAdminClient().rpc("increment_credits", { p_user: user.id, p_delta: cost });
+    } catch {
+      /* best-effort refund */
+    }
     return Response.json({ error: "Söhbət başladıla bilmədi." }, { status: 502 });
   }
-
-  // We've committed to answering — charge the credit now.
-  const newCredits = credits - cost;
-  await supabase.from("profiles").update({ credits: newCredits }).eq("id", user.id);
 
   const encoder = new TextEncoder();
   const readable = new ReadableStream<Uint8Array>({

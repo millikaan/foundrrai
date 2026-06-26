@@ -285,6 +285,13 @@ export function WebContainerPreview({
             title="Sayt önizləməsi"
             className="h-full w-full bg-white"
             allow="cross-origin-isolated"
+            onLoad={() => {
+              // Re-arm select / inline-text-edit modes after each (re)load — the
+              // auto-reload swaps the document and resets the injected scripts.
+              const win = iframeRef.current?.contentWindow;
+              win?.postMessage({ type: "foundrr:select", on: !!selecting }, "*");
+              win?.postMessage({ type: "foundrr:edit-text", on: !!editingText }, "*");
+            }}
           />
         ) : null}
 

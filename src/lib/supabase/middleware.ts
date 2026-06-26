@@ -64,7 +64,15 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname === "/signup")
   ) {
     const nextParam = request.nextUrl.searchParams.get("next");
-    const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : "/workspace";
+    // Only same-origin relative paths — reject protocol-relative (//host) and
+    // backslash tricks so `next` can't become an open redirect.
+    const safeNext =
+      nextParam &&
+      nextParam.startsWith("/") &&
+      !nextParam.startsWith("//") &&
+      !nextParam.startsWith("/\\")
+        ? nextParam
+        : "/workspace";
     return NextResponse.redirect(new URL(safeNext, request.url));
   }
 

@@ -12,6 +12,7 @@ import {
   PLAN_SYSTEM,
   type GenerateMode,
 } from "@/lib/ai/engine";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -62,20 +63,37 @@ export async function POST(request: Request) {
     );
   }
 
-  // Credits — checked + decremented server-side, refunded on failure.
+  // Credits — atomically deducted up-front (race-free), refunded on any failure.
   const cost = CREDIT_COSTS[mode];
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("credits")
-    .eq("id", user.id)
-    .single();
-  const credits = profile?.credits ?? 0;
-  if (credits < cost) {
-    return NextResponse.json(
-      { error: "Kredit kifayət etmir.", credits },
-      { status: 402 },
-    );
+  let creditsAfter = 0;
+  if (cost > 0) {
+    const { data: deducted, error: deductError } = await supabase.rpc("deduct_credits", {
+      p_cost: cost,
+    });
+    if (deductError) {
+      return NextResponse.json({ error: "Kredit yoxlanıla bilmədi." }, { status: 500 });
+    }
+    if (deducted === null || deducted === undefined) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("credits")
+        .eq("id", user.id)
+        .single();
+      return NextResponse.json(
+        { error: "Kredit kifayət etmir.", credits: profile?.credits ?? 0 },
+        { status: 402 },
+      );
+    }
+    creditsAfter = deducted as number;
   }
+  const refundCredits = async () => {
+    if (cost <= 0) return;
+    try {
+      await createAdminClient().rpc("increment_credits", { p_user: user.id, p_delta: cost });
+    } catch {
+      /* best-effort refund */
+    }
+  };
 
   const docExtras = (body.docs ?? [])
     .map((d) => `# ${d.name}\n${d.content}`)
@@ -106,12 +124,10 @@ export async function POST(request: Request) {
         completion.choices[0]?.message?.content ?? "{}",
       ) as { plan?: string[]; needsLogo?: boolean };
 
-      const newCredits = credits - cost;
-      await supabase.from("profiles").update({ credits: newCredits }).eq("id", user.id);
       return NextResponse.json({
         plan: parsed.plan ?? [],
         needsLogo: parsed.needsLogo ?? true,
-        credits: newCredits,
+        credits: creditsAfter,
       });
     }
 
@@ -135,9 +151,7 @@ export async function POST(request: Request) {
       const parsed = JSON.parse(
         completion.choices[0]?.message?.content ?? "{}",
       ) as { reply?: string };
-      const newCredits = credits - cost;
-      await supabase.from("profiles").update({ credits: newCredits }).eq("id", user.id);
-      return NextResponse.json({ reply: parsed.reply ?? "—", credits: newCredits });
+      return NextResponse.json({ reply: parsed.reply ?? "—", credits: creditsAfter });
     }
 
     // build | edit
@@ -184,16 +198,13 @@ export async function POST(request: Request) {
     const files = Array.isArray(parsed.files) ? parsed.files : [];
     const schema = typeof parsed.schema === "string" ? parsed.schema.trim() : "";
     if (files.length === 0) {
+      await refundCredits();
       return NextResponse.json({ error: "Sayt yaradıla bilmədi." }, { status: 502 });
     }
 
-    // Success → decrement credits + persist.
-    const newCredits = credits - cost;
-    await supabase.from("profiles").update({ credits: newCredits }).eq("id", user.id);
-
     let siteId = body.siteId;
     if (mode === "build") {
-      const { data: site } = await supabase
+      const { data: site, error: insertError } = await supabase
         .from("sites")
         .insert({
           owner_id: user.id,
@@ -204,7 +215,12 @@ export async function POST(request: Request) {
         })
         .select("id")
         .single();
-      siteId = site?.id;
+      if (insertError || !site?.id) {
+        // Don't charge for a build we failed to save.
+        await refundCredits();
+        return NextResponse.json({ error: "Sayt yadda saxlanmadı." }, { status: 500 });
+      }
+      siteId = site.id;
     } else if (mode === "edit" && siteId && schema) {
       // An edit that introduces/extends the backend updates the stored schema.
       await supabase.from("sites").update({ schema }).eq("id", siteId).eq("owner_id", user.id);
@@ -241,9 +257,10 @@ export async function POST(request: Request) {
       siteId,
       name: parsed.name,
       files,
-      credits: newCredits,
+      credits: creditsAfter,
     });
   } catch {
+    await refundCredits();
     return NextResponse.json({ error: "Generasiya xətası baş verdi." }, { status: 500 });
   }
 }
