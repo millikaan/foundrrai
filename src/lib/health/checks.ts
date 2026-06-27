@@ -74,9 +74,9 @@ function checkApp(): HealthComponent {
 /** Supabase auth/db reachability via the GoTrue health endpoint. */
 async function checkSupabase(): Promise<HealthComponent> {
   const base = {
-    key: "supabase",
+    key: "data",
     name: "Hesab və verilənlər",
-    description: "Giriş, qeydiyyat və layihə bazası (Supabase)",
+    description: "Giriş, qeydiyyat və məlumat bazası",
   } as const;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -94,9 +94,9 @@ async function checkSupabase(): Promise<HealthComponent> {
 /** OpenAI reachability via the free `models` list (no token cost). */
 async function checkOpenAI(): Promise<HealthComponent> {
   const base = {
-    key: "openai",
+    key: "ai",
     name: "AI mühərriki",
-    description: "Saytları yaradan və redaktə edən model (OpenAI)",
+    description: "Saytları yaradan və redaktə edən süni intellekt",
   } as const;
   const key = process.env.OPENAI_API_KEY;
   if (!key) {
@@ -119,9 +119,9 @@ async function checkOpenAI(): Promise<HealthComponent> {
 /** Vercel platform status via its public statuspage feed (best-effort). */
 async function checkVercel(): Promise<HealthComponent> {
   const base = {
-    key: "vercel",
+    key: "hosting",
     name: "Hostinq platforması",
-    description: "Tətbiqin işlədiyi infrastruktur (Vercel)",
+    description: "Tətbiqin işlədiyi server infrastrukturu",
   } as const;
   const { res, ms } = await timedProbe(
     "https://www.vercel-status.com/api/v2/status.json",

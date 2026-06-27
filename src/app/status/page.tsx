@@ -18,7 +18,11 @@ export default async function StatusPage() {
   const report = await getHealthReport();
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 py-10 sm:py-16">
+    <main className="relative mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 py-10 sm:py-16">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(70%_100%_at_50%_0%,hsl(var(--grad-violet)/0.10),hsl(var(--grad-pink)/0.05)_45%,transparent_75%)]"
+      />
       <header className="flex items-center justify-between">
         <Link
           href="/"

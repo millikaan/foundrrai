@@ -5,8 +5,8 @@ import {
   Database,
   Globe,
   RefreshCw,
+  Server,
   Sparkles,
-  Triangle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,36 +20,40 @@ const REFRESH_INTERVAL_MS = 30_000;
 
 const ICONS: Record<string, LucideIcon> = {
   app: Globe,
-  supabase: Database,
-  openai: Sparkles,
-  vercel: Triangle,
+  data: Database,
+  ai: Sparkles,
+  hosting: Server,
+};
+
+/** Per-service icon tile accent (brand hues) — constant, NOT tied to status. */
+const ACCENT: Record<string, string> = {
+  app: "bg-[hsl(var(--grad-violet)/0.12)] text-[hsl(var(--grad-violet))]",
+  data: "bg-[hsl(var(--grad-blue)/0.12)] text-[hsl(var(--grad-blue))]",
+  ai: "bg-[hsl(var(--grad-pink)/0.12)] text-[hsl(var(--grad-pink))]",
+  hosting: "bg-[hsl(var(--grad-orange)/0.14)] text-[hsl(var(--grad-orange))]",
 };
 
 const STATUS_UI: Record<
   ComponentStatus,
-  { dot: string; tile: string; pill: string; label: string }
+  { dot: string; pill: string; label: string }
 > = {
   operational: {
     dot: "bg-[hsl(152_62%_40%)]",
-    tile: "bg-[hsl(152_62%_40%/0.12)] text-[hsl(152_50%_30%)]",
     pill: "bg-[hsl(152_62%_40%/0.12)] text-[hsl(152_50%_28%)]",
     label: "İşləkdir",
   },
   degraded: {
     dot: "bg-[hsl(38_92%_50%)]",
-    tile: "bg-[hsl(38_92%_50%/0.16)] text-[hsl(30_72%_36%)]",
     pill: "bg-[hsl(38_92%_50%/0.16)] text-[hsl(30_72%_34%)]",
     label: "Qismən",
   },
   down: {
     dot: "bg-[hsl(var(--destructive))]",
-    tile: "bg-[hsl(var(--destructive)/0.12)] text-[hsl(var(--destructive))]",
     pill: "bg-[hsl(var(--destructive)/0.12)] text-[hsl(var(--destructive))]",
     label: "İşləmir",
   },
   unknown: {
     dot: "bg-muted-foreground/50",
-    tile: "bg-muted text-muted-foreground",
     pill: "bg-muted text-muted-foreground",
     label: "Naməlum",
   },
@@ -87,10 +91,11 @@ function relativeTime(sinceMs: number, nowMs: number): string {
 function ComponentRow({ component }: { component: HealthComponent }) {
   const ui = STATUS_UI[component.status];
   const Icon = ICONS[component.key] ?? Globe;
+  const accent = ACCENT[component.key] ?? "bg-muted text-muted-foreground";
   return (
-    <li className="flex items-center gap-4 px-4 py-4 sm:px-5">
+    <li className="flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/30 sm:px-5">
       <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${ui.tile}`}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent}`}
       >
         <Icon className="h-5 w-5" />
       </div>
@@ -161,10 +166,12 @@ export function StatusBoard({ initial }: { initial: HealthReport }) {
   return (
     <div className="mt-8">
       {/* Hero */}
-      <section className={`rounded-2xl border px-5 py-5 sm:px-6 sm:py-6 ${hero.tint}`}>
-        <div className="flex items-start justify-between gap-4">
+      <section
+        className={`rounded-2xl border px-5 py-5 shadow-[0_18px_50px_-32px_hsl(240_22%_13%/0.28)] sm:px-6 sm:py-6 ${hero.tint}`}
+      >
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <span className="relative mt-0.5 flex h-3.5 w-3.5 shrink-0">
+            <span className="relative flex h-3.5 w-3.5 shrink-0">
               <span
                 className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${STATUS_UI[report.status].dot}`}
               />
@@ -173,7 +180,7 @@ export function StatusBoard({ initial }: { initial: HealthReport }) {
               />
             </span>
             <div>
-              <h1 className="text-[18px] font-semibold tracking-tight sm:text-[21px]">
+              <h1 className="text-[18px] font-semibold tracking-tight sm:text-[20px]">
                 {hero.title}
               </h1>
               <p className="mt-1 text-[13px] text-muted-foreground">
@@ -188,7 +195,7 @@ export function StatusBoard({ initial }: { initial: HealthReport }) {
             onClick={refresh}
             disabled={loading}
             aria-label="Yenilə"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card/70 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-sm transition-colors hover:text-foreground disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -196,7 +203,7 @@ export function StatusBoard({ initial }: { initial: HealthReport }) {
       </section>
 
       {/* Component list */}
-      <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-card/60">
+      <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-card/60 shadow-[0_18px_50px_-34px_hsl(240_22%_13%/0.25)]">
         <ul className="divide-y divide-border">
           {report.components.map((c) => (
             <ComponentRow key={c.key} component={c} />
