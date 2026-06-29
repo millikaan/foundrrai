@@ -1,38 +1,40 @@
 # Foundrr — DESIGN.md
 
-The design bible for Foundrr's own marketing site and app UI. The visual reference is **Lovable's landing page**. Match how it *feels* — but **you choose the exact colors yourself.** This file gives direction and structure, not a palette. Pairs with `CLAUDE.md` and `FOUNDRR_AGENT.md`.
+The design bible for Foundrr's own marketing site and app UI. Foundrr is **inspired by soft prompt-first AI builder sites**, but it must not be a one-to-one replica. Use Foundrr's own cool cyan/teal/blue palette, Azerbaijani copy, local business examples, and a more product-led hero layout. Pairs with `CLAUDE.md` and `FOUNDRR_AGENT.md`.
 
-> Goal: a **light**, bright, premium landing — a stranger lands, sees a glowing hero with a prompt box as the centerpiece, types one sentence, and is pulled into signup → build. Calm, fast, confident. If it looks like a generic AI template, it's wrong.
+> Goal: a polished, prompt-first AI builder landing for the Azerbaijan market — a stranger lands, sees a bright Foundrr-colored hero, understands the one-sentence-to-site workflow, and starts building. The page should resemble the attached references in softness, typography discipline, and prompt-first UX, while clearly using Foundrr's own colors and layout.
 
 > **Business note for all copy:** Foundrr does **not** host sites and does **not** sell domains. The user deploys to **their own** Vercel/Netlify and buys/connects **their own** domain. Never write "hosting included" or "free domain." The promise: *the site is fully yours, on your own account.*
 
 ---
 
-## 1. The reference — Lovable's landing (match this feel)
+## 1. Landing layout (the structural pattern)
 
-- **Light theme.** A bright, near-white / softly warm background — not dark. Generous whitespace, lots of air.
-- **Prompt-first hero.** Centered: a short bold headline, one line of subtext, then **a large prompt input box as the hero element** — not a screenshot, not a stat block. Small actions bottom-left (attach, a toggle), a circular send button bottom-right. Below: a row of small example "chips."
-- **A soft, luminous gradient bloom** behind the hero — colorful light rising from the center and fading into the light background. This is the signature mood (see §4).
+- **Light theme.** A bright, cool near-white background — not dark. Generous whitespace, lots of air.
+- **Prompt-first hero.** Left-led content with the prompt box as the main action and a Foundrr-styled live build preview beside it on desktop. Keep mobile stacked and clean.
+- **Soft gradient wash** behind the hero — cool blue/cyan/teal, not the reference site's warm pink/orange. No circular glow blobs.
 - **Community / templates showcase** under the hero: a grid of project thumbnails in little browser frames. Shows real output, builds trust.
 - **Light social proof.**
 - **Clean sections** after, one accent used sparingly, crisp typography.
+- **Pricing is not on the landing page.** Pricing lives only at `/pricing` and is linked from the menu.
 - **Workspace (post-signup):** left sidebar with projects + credits + Upgrade; centered "Time to ship, {name}" with a prompt box; the builder adds a right-side live **Preview** with a **Database** tab and a top-right **Publish** button.
 
-Reproduce this skeleton exactly. The identity that makes it Foundrr (not Lovable) is the Azerbaijani copy, the showcase of real AZ businesses, and the palette **you** design.
+Use the reference as inspiration, not a template. The identity that makes it Foundrr is the Azerbaijani copy, the showcase of real AZ businesses, the cool palette, and the product-led hero composition.
 
 ---
 
-## 2. Color — you decide (do NOT wait for hex values here)
+## 2. Color — the committed palette (Foundrr cool aurora)
 
-There are intentionally no colors specified in this file. Build the palette yourself, in the spirit of Lovable's landing:
+Foundrr's current identity is a **cool near-white** light theme with dark slate ink, pale cool panels, and a cyan/teal/blue aurora ramp used in big structural fields. All values are semantic HSL tokens in `globals.css`; prefer tokens and shared primitives over one-off component colors.
 
-- **Light base:** a bright near-white or gently warm off-white background; dark, high-contrast text.
-- **Hero bloom:** a soft, modern, multi-hue luminous gradient — bright but tasteful, blending a few harmonious colors that fade smoothly into the light background. Pick the hues; make them cohesive and premium, not neon.
-- **One accent:** choose a single accent color for buttons, links, focus states, and the step numbers. Use it sparingly.
-- Define **every** color, gradient, shadow, and font as **semantic tokens (HSL)** in `index.css` / `tailwind.config.ts`. Never hardcode colors in components (`text-white`, `bg-black`, raw hex). Customize shadcn variants from the tokens.
-- Ensure real contrast on the light background (dark text, legible muted tones), visible focus rings, and a coherent system reused everywhere.
+- **Light base:** cool near-white background, dark slate ink.
+- **Panels:** pale cool off-white for large demo/stat/footer surfaces.
+- **Primary action:** teal fill with white text. Outline buttons are white/hairline.
+- **Aurora ramp:** blue `--grad-blue` → cyan `--grad-violet` → teal `--grad-pink` → green `--grad-orange`. This ramp belongs in hero/final gradient fields, brand mark, and occasional accent fills.
+- **Logo / `.brand-mark`:** small cool aurora rounded mark, not a literal clone of another builder logo.
+- Dark color-scheme is intentionally disabled for the marketing surface; the page remains light even on dark OS settings.
 
-Then review your palette: if it reads like the default you'd pick for any site, push it until it feels made for Foundrr. Commit to it and use it consistently across the whole app.
+Keep contrast strong, focus rings visible, and the system consistent everywhere.
 
 ---
 
@@ -46,16 +48,19 @@ Then review your palette: if it reads like the default you'd pick for any site, 
 
 ---
 
-## 4. The signature — the hero bloom
+## 4. The signature — colorful B2B SaaS (no bubbles)
 
-The one bold element; everything else stays quiet. Recreate Lovable's luminous light-bloom behind the centered hero:
+Foundrr's mood is **clean, soft, prompt-first AI builder** for the Azerbaijan market. Lean into the large cool gradient fields and sparse white UI, used structurally rather than as decoration. The signature:
 
-- Hero is `position:relative; overflow:hidden`.
-- A blurred gradient layer sits behind the content, large, centered, rising from near the top, fading into the light background. Use layered radial gradients in your chosen hues, blurred, at a tasteful opacity.
-- Optionally a very faint grid masked to fade out under the hero for subtle depth.
-- Reuse a smaller, dimmer bloom behind the final CTA.
+- **No decorative kickers by default** — section headings stand on their own, like the reference screenshots.
+- **Aurora gradient, used structurally** — full hero field, final CTA field, and brand mark. Avoid gradient text and colorful feature cards unless a specific surface needs it.
+- **Quiet feature panels** — pale split containers or large stat blocks with black text, not icon-heavy cards.
+- **Show the real product (anti-slop #1)** — the showcase renders real generated AZ sites (`SitePreview` + `TemplateSite`), not abstract gradients. Real product UI is what keeps the page from reading as a generic AI template. (A hero product-frame mockup was tried and removed at the user's request — the hero stays minimal: headline + subtext + prompt box.) References (Mobbin): FLORA, Height, Antimetal.
+- **No dark feature band** — the current system stays light from top to bottom.
+- **Bold gradient hero** — the hero sits on a full-bleed cool aurora gradient via `.bloom-hero`. Headline is solid dark slate; the prompt box is the primary action.
+- **Gradient final CTA with footer panel** — the closing CTA floats over a soft cool gradient, followed by a large rounded pale footer panel.
 
-Spend the boldness here. Keep the rest disciplined.
+**Forbidden (reads as bad / as a clone):** pill "bubble" labels (eyebrows), avatar-circle rows, alternating gray bands, and circular blurred glow-blobs. These were removed in the redesign — do **not** reintroduce them.
 
 ---
 
@@ -76,9 +81,9 @@ All copy in **Azerbaijani**, exactly as below.
 - Eyebrow pill: `• AI ilə saniyələr içində sayt`.
 - H1 (two lines): **Fikrini yaz.** / **Saytın hazır olsun.** (line 2 may use the accent or a subtle gradient text).
 - Sub: *Azərbaycan üçün AI sayt qurucusu. Bir cümlə yaz — dəqiqələr içində hazır sayt. Öz hesabına yayımla, tam sənin olsun.*
-- **Prompt box** (max-width ~660px, the centerpiece): light surface, hairline border, generous radius, soft shadow + a gentle glow in your accent. Rotating placeholder (§7). Bottom row over a hairline: left = `＋ Şəkil əlavə et` + `🌐 Açıq` pills; right = circular accent send `↑`. On `:focus-within`, border → accent and the glow lifts.
+- **Prompt box + live preview**: prompt is the main action; on desktop pair it with a Foundrr-styled live build preview showing `Sayt yaradılır`, `Preview yaradılır`, build progress, and module cards. On mobile keep the prompt compact and let the next section title peek into the first viewport.
 - Chips (centered): Diş klinikası · Gül mağazası · Restoran · Rent-a-car · Barbershop — each with accent `↑`.
-- Social proof: **500+** Azərbaycan biznesi Foundrr ilə qurur.
+- Social proof uses launch-realistic product facts only; do not invent user volume.
 
 ### 6.2 Showcase — "Foundrr ilə qurulanlar"
 Subhead: *Bir cümlədən başlayan saytlar*. A 3-col grid (2 / 1 on smaller) of browser-frame cards: Dental Gülüm · Gül Evi · Sahil Rent-a-Car · Laləzar Restoran · Usta Barbershop · Ayla Store. URLs shown are the businesses' **own** connected domains. Replace with real generated sites in production.
@@ -96,8 +101,8 @@ A bordered container split into 4 cells, bold label + one muted line:
 - **Forma & ödəniş bazası** — Sifariş və rezervasiyalar Supabase-ə düşür.
 - **Anında dəyişiklik** — Bir cümlə yaz — sayt dərhal yenilənir.
 
-### 6.5 Pricing — "Sadə qiymət"
-Subhead: *Qurmaq pulsuzdur — krediti bitəndə yenilə*. Three plans, **middle ("Pro") highlighted** with an accent border + "Ən populyar" badge:
+### 6.5 Pricing page — `/pricing`
+Pricing must not appear on the landing page. The menu item `Qiymət` routes to `/pricing`. The pricing page has the heading **Sadə qiymət** and subhead *Qurmaq pulsuzdur — krediti bitəndə yenilə*. Three plans, **middle ("Pro") highlighted** with an accent border + "Ən populyar" badge:
 - **Pulsuz — 0 ₼** · 5 qurma krediti · Limitsiz önizləmə · Anında redaktə · Bütün şablonlar → outline btn `Başla`.
 - **Pro — 19 ₼/ay** · 100 kredit / ay · Öz Vercel/Netlify hesabına yayım · Brendsiz · Forma bazası (Supabase) → accent btn `Pro-ya keç`.
 - **Biznes — 49 ₼/ay** · Limitsiz kredit · Ödəniş inteqrasiyası · Komanda · Prioritet dəstək → outline btn `Əlaqə`.

@@ -9,9 +9,15 @@ import { ProfileMenu } from "@/components/account/profile-menu";
 
 const NAV_LINKS = [
   { href: "/#how", label: "Necə işləyir" },
+  { href: "/#showcase", label: "Şablonlar" },
+  { href: "/pricing", label: "Qiymət" },
+  { href: "/status", label: "Status" },
+];
+
+const MOBILE_NAV_LINKS = [
+  { href: "/#how", label: "Necə işləyir" },
   { href: "/#showcase", label: "Nümunələr" },
-  { href: "/#pricing", label: "Qiymət" },
-  { href: "/#showcase", label: "Kəşf et" },
+  { href: "/pricing", label: "Qiymət" },
 ];
 
 export interface NavUser {
@@ -34,19 +40,19 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
+        "fixed inset-x-0 top-0 z-50 border-b transition-all duration-300",
         scrolled
-          ? "border-b border-border bg-background/70 backdrop-blur-xl"
-          : "border-b border-transparent",
+          ? "border-border bg-background/88 backdrop-blur-xl shadow-[0_1px_12px_hsl(var(--foreground)/0.04)]"
+          : "border-border/60 bg-background/80 backdrop-blur-md",
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-[1160px] items-center justify-between px-6">
+      <nav className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold tracking-tight"
+          className="flex items-center gap-2.5 font-semibold tracking-tight"
         >
-          <span className="brand-mark h-6 w-6 rounded-[7px] shadow-[0_4px_14px_-4px_hsl(var(--grad-pink)/0.7)]" />
-          <span className="text-[17px]">Foundrr</span>
+          <span className="brand-mark h-5 w-5 shadow-[0_8px_18px_-8px_hsl(var(--grad-violet)/0.8)]" />
+          <span className="text-[18px]">Foundrr</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -54,7 +60,19 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
             <Link
               key={link.label}
               href={link.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-lg px-3.5 py-2 text-[14px] font-medium text-foreground transition-colors hover:bg-muted/70"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="hidden items-center gap-1 max-md:flex max-sm:hidden">
+          {MOBILE_NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="rounded-lg px-2.5 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-muted/70"
             >
               {link.label}
             </Link>

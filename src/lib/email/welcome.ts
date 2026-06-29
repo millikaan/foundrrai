@@ -10,7 +10,7 @@ export function welcomeEmailHtml(name?: string | null): string {
     intro:
       "Fikrini yaz — saytın hazır olsun. Bir cümlə kifayətdir: biznesini təsvir et, Foundrr sənə tam işlək, real sayt qursun.",
     bodyHtml:
-      '<p style="margin:12px 0 0;font-size:15.5px;line-height:1.65;color:#55506a;">Hesabında <b style="color:#1b1830;">100 pulsuz kredit</b> var — ilk saytını elə indi qura bilərsən.</p>',
+      '<p style="margin:12px 0 0;font-size:15.5px;line-height:1.65;color:#46555b;">Hesabında <b style="color:#0f1b1f;">100 pulsuz kredit</b> var — ilk saytını elə indi qura bilərsən.</p>',
     ctaLabel: "İlk saytını qur",
     ctaUrl: `${SITE_URL}/workspace`,
     footnote: "Bu məktubu Foundrr hesabı açdığın üçün aldın.",
@@ -21,7 +21,7 @@ export function welcomeEmailHtml(name?: string | null): string {
 export async function sendWelcomeEmail(to: string, name?: string | null): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || !to) return false;
-  const from = process.env.WELCOME_FROM ?? "Foundrr <salam@foundrr.online>";
+  const from = process.env.WELCOME_FROM ?? "Foundrr <kaan@guluzada.dev>";
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

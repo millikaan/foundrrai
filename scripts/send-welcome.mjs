@@ -8,7 +8,7 @@
 
 const to = process.argv[2];
 const apiKey = process.env.RESEND_API_KEY;
-const from = process.env.WELCOME_FROM ?? "Foundrr <salam@foundrr.online>";
+const from = process.env.WELCOME_FROM ?? "Foundrr <kaan@guluzada.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.foundrr.online";
 const name = process.argv[3] ?? "Kaan";
 

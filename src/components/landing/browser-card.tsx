@@ -41,26 +41,28 @@ export function BrowserCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(var(--foreground)/0.18)] hover:shadow-[0_24px_55px_-30px_hsl(28_22%_14%/0.20)]",
+        "group relative transition-all duration-300 hover:-translate-y-0.5",
         className,
       )}
     >
       {/* a real, scaled-down template site as the preview (non-interactive) */}
-      <div className="relative aspect-[16/10] overflow-hidden border-b border-border">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-[18px] border border-border bg-card shadow-[0_1px_1px_hsl(var(--foreground)/0.04),0_16px_42px_-38px_hsl(var(--foreground)/0.28)] transition-shadow duration-300 group-hover:shadow-[0_1px_1px_hsl(var(--foreground)/0.04),0_22px_54px_-40px_hsl(var(--foreground)/0.34)]">
         <Template id={item.id} />
         <span className="absolute bottom-1.5 right-2 z-10 rounded-md bg-[hsl(var(--foreground)/0.72)] px-1.5 py-0.5 font-mono text-[9px] text-background backdrop-blur-sm">
           {item.domain}
         </span>
       </div>
 
-      <div className="px-4 py-3.5">
+      <div className="pt-3.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold">{item.name}</span>
-          <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+          <span className="text-[16px] font-semibold tracking-tight text-foreground">
+            {item.name}
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground max-sm:hidden">
             {item.tag}
           </span>
         </div>
-        <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 text-[14px] font-medium leading-relaxed text-muted-foreground">
           {item.desc}
         </p>
       </div>

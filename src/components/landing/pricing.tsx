@@ -4,7 +4,6 @@ import { Check } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { Bloom } from "./bloom";
 import { Reveal } from "./reveal";
 
 interface Plan {
@@ -13,7 +12,7 @@ interface Plan {
   period: string;
   features: ReadonlyArray<string>;
   cta: string;
-  variant: "accent" | "outline";
+  variant: "accent" | "outline" | "gradient";
   href: string;
   featured?: boolean;
   badge?: string;
@@ -52,7 +51,7 @@ const PLANS: ReadonlyArray<Plan> = [
     badge: "Ən populyar",
   },
   {
-    name: "Max",
+    name: "Biznes",
     price: "99.99 ₼",
     period: "/ay",
     features: [
@@ -62,7 +61,7 @@ const PLANS: ReadonlyArray<Plan> = [
       "Ödəniş inteqrasiyası",
       "Prioritet dəstək",
     ],
-    cta: "Max-a keç",
+    cta: "Əlaqə",
     variant: "outline",
     href: "/signup?intent=build",
   },
@@ -70,45 +69,41 @@ const PLANS: ReadonlyArray<Plan> = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="relative overflow-hidden px-6 py-[100px]">
-      <Bloom
-        variant="cta"
-        className="pointer-events-none absolute inset-x-0 top-28 -z-10 mx-auto h-[420px] max-w-[820px] opacity-45"
-      />
-
-      <div className="mx-auto max-w-[1120px]">
-        <Reveal className="mx-auto max-w-[640px] text-center">
+    <section className="relative overflow-hidden px-5 py-[112px] sm:px-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(65%_48%_at_50%_0%,hsl(var(--grad-violet)/0.24),transparent_70%)]" />
+      <div className="mx-auto max-w-[1180px]">
+        <Reveal className="mx-auto flex max-w-[680px] flex-col items-center text-center">
           <h2
             className="text-balance font-semibold tracking-tight"
-            style={{ fontSize: "clamp(28px, 3.6vw, 40px)", lineHeight: 1.1 }}
+            style={{ fontSize: "clamp(38px, 5vw, 58px)", lineHeight: 1.04 }}
           >
             Sadə qiymət
           </h2>
-          <p className="mt-4 text-[17px] text-muted-foreground">
+          <p className="mt-4 text-[17px] font-medium text-foreground/72">
             Qurmaq pulsuzdur — krediti bitəndə yenilə.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <div className="mt-14 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3">
           {PLANS.map((plan, index) => (
             <Reveal key={plan.name} delay={index * 80}>
               <div
                 className={cn(
-                  "relative flex h-full flex-col rounded-3xl border p-7 transition-all duration-300",
+                  "relative flex h-full min-h-[480px] flex-col rounded-[22px] border p-7 transition-all duration-300",
                   plan.featured
-                    ? "border-primary/40 bg-gradient-to-b from-primary/[0.07] to-card shadow-[0_36px_80px_-34px_hsl(var(--primary)/0.5)] lg:-translate-y-3"
-                    : "border-border bg-card hover:-translate-y-1 hover:shadow-[0_28px_60px_-36px_hsl(240_22%_13%/0.28)]",
+                    ? "border-primary/55 bg-background shadow-[0_28px_70px_-42px_hsl(var(--primary)/0.55)] lg:-translate-y-3"
+                    : "border-transparent bg-card hover:-translate-y-1",
                 )}
               >
                 {plan.badge ? (
-                  <span className="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.7)]">
+                  <span className="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_-10px_hsl(var(--primary)/0.7)]">
                     {plan.badge}
                   </span>
                 ) : null}
 
-                <h3 className="text-[15px] font-semibold text-foreground">{plan.name}</h3>
+                <h3 className="text-[16px] font-semibold text-foreground">{plan.name}</h3>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-[34px] font-semibold tracking-tight text-foreground">
+                  <span className="text-[42px] font-semibold tracking-tight text-foreground">
                     {plan.price}
                   </span>
                   {plan.period ? (
@@ -116,15 +111,15 @@ export function Pricing() {
                   ) : null}
                 </div>
 
-                <div className="my-6 h-px bg-border" />
+                <div className="my-7 h-px bg-border" />
 
                 <ul className="flex flex-1 flex-col gap-3.5">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-[14px]">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                         <Check className="h-3 w-3" strokeWidth={3} />
                       </span>
-                      <span className="text-foreground/85">{feature}</span>
+                      <span className="font-medium text-foreground/82">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -140,7 +135,7 @@ export function Pricing() {
           ))}
         </div>
 
-        <p className="mx-auto mt-10 max-w-[640px] text-center text-[13px] leading-relaxed text-muted-foreground">
+        <p className="mx-auto mt-10 max-w-[640px] text-center text-[13px] font-medium leading-relaxed text-muted-foreground">
           Foundrr hostinq və ya domen satmır — saytı öz hesabına yayımlayır,
           domenini özün alırsan.
         </p>

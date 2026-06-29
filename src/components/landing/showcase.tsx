@@ -1,72 +1,36 @@
-"use client";
-
-import * as React from "react";
+import Link from "next/link";
 
 import { TEMPLATES } from "@/lib/templates";
-import { cn } from "@/lib/utils";
-import { Bloom } from "./bloom";
 import { BrowserCard } from "./browser-card";
 import { Reveal } from "./reveal";
 
-const CATEGORIES = [
-  "Hamısı",
-  "İcarə",
-  "Restoran",
-  "Salon",
-  "Klinika",
-  "Mağaza",
-  "E-ticarət",
-] as const;
-
 export function Showcase() {
-  const [active, setActive] = React.useState<string>("Hamısı");
-  const items =
-    active === "Hamısı" ? TEMPLATES : TEMPLATES.filter((t) => t.tag === active);
-
   return (
-    <section id="showcase" className="relative px-6 py-[120px]">
-      <Bloom
-        variant="cta"
-        className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[420px] max-w-[820px] opacity-50"
-      />
+    <section id="showcase" className="relative px-5 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <Reveal className="max-w-[720px]">
+            <h2
+              className="font-semibold tracking-tight text-foreground"
+              style={{ fontSize: "clamp(34px, 4.6vw, 56px)", lineHeight: 1.04 }}
+            >
+              Şablonları kəşf et
+            </h2>
+            <p className="mt-3 text-[16px] font-medium leading-relaxed text-foreground/64 sm:text-[17px]">
+              Növbəti layihəni hazır şablonla başlat.
+            </p>
+          </Reveal>
 
-      <div className="mx-auto max-w-[1160px]">
-        <Reveal className="mx-auto max-w-[640px] text-center">
-          <h2
-            className="font-semibold tracking-tight text-foreground"
-            style={{ fontSize: "clamp(28px, 3.6vw, 42px)", lineHeight: 1.08 }}
+          <Link
+            href="/#showcase"
+            className="inline-flex h-10 w-fit items-center justify-center rounded-xl border border-border bg-background/76 px-4 text-[14px] font-medium text-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:bg-muted/70"
           >
-            Şablonları kəşf et
-          </h2>
-          <p className="mt-4 text-[17px] leading-relaxed text-muted-foreground">
-            Hazır bir şablonla başla — bir kliklə remix et, sonra söhbətlə öz
-            biznesinə uyğunlaşdır.
-          </p>
-        </Reveal>
-
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-2.5">
-          {CATEGORIES.map((category) => {
-            const on = active === category;
-            return (
-              <button
-                key={category}
-                onClick={() => setActive(category)}
-                aria-pressed={on}
-                className={cn(
-                  "inline-flex h-9 items-center rounded-full border px-4 text-[13px] font-medium transition-colors",
-                  on
-                    ? "border-transparent bg-foreground text-background"
-                    : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground",
-                )}
-              >
-                {category}
-              </button>
-            );
-          })}
+            Hamısına bax
+          </Link>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+        <div className="mt-10 grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {TEMPLATES.map((item) => (
             <BrowserCard key={item.id} item={item} />
           ))}
         </div>

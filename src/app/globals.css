@@ -1,89 +1,51 @@
 @import "tailwindcss";
 
 /*
-  Foundrr design system — LIGHT theme with Lovable's VIVID gradient.
-  Bright warm-white canvas; a saturated multi-hue gradient (blue → violet →
-  pink → orange) blooms up from the bottom of the hero and wraps the closing
-  CTA + footer. One violet accent. Semantic HSL tokens only.
+  Foundrr design system — inspired by soft prompt-first AI builders, but using
+  Foundrr's own cool cyan/teal/blue palette and a more product-led layout.
 */
 
 :root {
-  --background: 40 30% 99%;          /* bright warm white */
-  --foreground: 240 22% 13%;         /* dark ink — ~15:1 */
+  --background: 190 38% 99%;
+  --foreground: 202 28% 11%;
 
-  --card: 40 46% 98%;                /* warm cream surfaces */
-  --card-foreground: 240 22% 13%;
-  --popover: 40 46% 98%;
-  --popover-foreground: 240 22% 13%;
+  --card: 190 36% 96%;
+  --card-foreground: 202 28% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 202 28% 11%;
 
-  --muted: 38 30% 95%;
-  --muted-foreground: 240 6% 42%;    /* ~4.8:1 on bg */
-  --secondary: 38 30% 95%;
-  --secondary-foreground: 240 18% 20%;
+  --muted: 190 24% 93%;
+  --muted-foreground: 202 10% 42%;
+  --secondary: 190 24% 93%;
+  --secondary-foreground: 202 22% 20%;
 
-  --border: 38 24% 90%;
-  --input: 38 24% 90%;
-  --ring: 262 80% 56%;
+  --border: 190 22% 87%;
+  --input: 190 22% 87%;
+  --ring: 180 82% 36%;
 
-  /* The single accent — violet */
-  --primary: 262 80% 56%;
+  --primary: 180 82% 36%;
   --primary-foreground: 0 0% 100%;
-  --primary-hover: 262 80% 50%;
-  --accent: 262 80% 56%;
+  --primary-hover: 180 82% 30%;
+  --accent: 205 92% 52%;
   --accent-foreground: 0 0% 100%;
 
   --destructive: 0 72% 52%;
   --destructive-foreground: 0 0% 100%;
 
-  --radius: 0.9rem;
+  --radius: 1rem;
 
-  /* Vivid gradient hues */
-  --grad-blue: 224 100% 62%;
-  --grad-violet: 268 95% 64%;
-  --grad-pink: 330 100% 64%;
-  --grad-orange: 26 100% 60%;
+  /* Foundrr aurora ramp. Token names are legacy. */
+  --grad-blue: 212 96% 58%;
+  --grad-violet: 190 94% 55%;
+  --grad-pink: 176 78% 42%;
+  --grad-orange: 152 76% 48%;
 
   color-scheme: light;
 }
 
-/*
-  System dark mode — applied ONLY when the OS/browser prefers dark.
-  No preference (or light) keeps the default light theme above.
-*/
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
-
-    --background: 240 16% 6%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 14% 9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 14% 9%;
-    --popover-foreground: 0 0% 98%;
-
-    --muted: 240 10% 15%;
-    --muted-foreground: 240 8% 66%;
-    --secondary: 240 10% 15%;
-    --secondary-foreground: 0 0% 96%;
-
-    --border: 240 8% 18%;
-    --input: 240 8% 18%;
-    --ring: 262 90% 66%;
-
-    --primary: 262 90% 66%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 262 90% 72%;
-    --accent: 262 90% 66%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 72% 56%;
-    --destructive-foreground: 0 0% 100%;
-
-    --grad-blue: 224 100% 66%;
-    --grad-violet: 268 95% 68%;
-    --grad-pink: 330 100% 66%;
-    --grad-orange: 26 100% 62%;
+    color-scheme: light;
   }
 }
 
@@ -128,7 +90,8 @@
   }
 
   body {
-    background-color: hsl(var(--background));
+    background:
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(190 38% 99%) 46%, hsl(0 0% 100%) 100%);
     color: hsl(var(--foreground));
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -136,7 +99,7 @@
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.2);
+    background: hsl(var(--grad-violet) / 0.22);
   }
 }
 
@@ -149,36 +112,39 @@
 
 .bloom-hero {
   inset: 0 0 auto 0;
-  height: 1000px;
+  height: 920px;
   background:
-    radial-gradient(72% 40% at 50% 104%, hsl(var(--grad-orange) / 0.52), transparent 58%),
-    radial-gradient(82% 50% at 50% 86%, hsl(var(--grad-pink) / 0.58), transparent 60%),
-    radial-gradient(95% 56% at 50% 70%, hsl(var(--grad-violet) / 0.46), transparent 66%),
-    radial-gradient(52% 56% at 3% 54%, hsl(var(--grad-blue) / 0.5), transparent 58%),
-    radial-gradient(52% 56% at 97% 50%, hsl(226 100% 62% / 0.5), transparent 58%);
-  filter: saturate(118%) blur(26px);
+    linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--grad-blue) / 0.28) 28%,
+      hsl(var(--grad-violet) / 0.42) 55%,
+      hsl(var(--grad-pink) / 0.36) 78%,
+      hsl(var(--background)) 100%
+    ),
+    radial-gradient(62% 48% at 86% 30%, hsl(var(--grad-blue) / 0.52), transparent 64%),
+    radial-gradient(52% 44% at 16% 70%, hsl(var(--grad-orange) / 0.34), transparent 66%),
+    radial-gradient(64% 38% at 76% 92%, hsl(var(--grad-violet) / 0.34), transparent 66%);
+  filter: saturate(118%) blur(30px);
 }
 
-/* Closing zone (CTA + footer) — vivid at the bottom, white at the top */
+/* Soft brand backdrop for the workspace shell — gentle, not a glow blob */
 .bloom-closing {
   inset: 0;
   background:
-    radial-gradient(78% 42% at 50% 102%, hsl(var(--grad-pink) / 0.62), transparent 58%),
-    radial-gradient(98% 48% at 50% 86%, hsl(var(--grad-violet) / 0.5), transparent 62%),
-    radial-gradient(60% 44% at 4% 78%, hsl(var(--grad-blue) / 0.52), transparent 58%),
-    radial-gradient(60% 44% at 96% 74%, hsl(226 100% 62% / 0.52), transparent 58%);
-  filter: saturate(116%) blur(30px);
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--grad-blue) / 0.2) 48%, hsl(var(--grad-violet) / 0.34) 100%),
+    radial-gradient(64% 46% at 50% 88%, hsl(var(--grad-orange) / 0.26), transparent 66%);
+  filter: saturate(108%) blur(32px);
 }
 
-/* Soft bloom for inline accents (e.g. behind the Meet mockup) */
+/* Faint inline accent (e.g. behind a mockup) — barely-there, never a glow blob */
 .bloom-cta {
   inset: -40% 0 0 0;
   background:
-    radial-gradient(46% 44% at 30% 70%, hsl(var(--grad-violet) / 0.3), transparent 70%),
-    radial-gradient(50% 44% at 70% 64%, hsl(var(--grad-blue) / 0.28), transparent 70%),
-    radial-gradient(58% 44% at 50% 92%, hsl(var(--grad-pink) / 0.26), transparent 72%);
-  filter: saturate(112%) blur(40px);
-  opacity: 0.85;
+    radial-gradient(48% 46% at 50% 60%, hsl(var(--grad-violet) / 0.14), transparent 72%),
+    radial-gradient(54% 46% at 70% 70%, hsl(var(--grad-orange) / 0.12), transparent 74%);
+  filter: saturate(104%) blur(46px);
+  opacity: 0.7;
 }
 
 /* Gradient text for the accent headline line + stat numbers */
@@ -196,8 +162,48 @@
 }
 
 .brand-mark {
-  background: linear-gradient(135deg, hsl(var(--grad-pink)), hsl(var(--grad-orange)) 55%, hsl(var(--grad-violet)));
-  border-radius: 9999px; /* circular logo everywhere (overrides rounded-* utilities) */
+  background: linear-gradient(135deg, hsl(var(--grad-blue)), hsl(var(--grad-violet)) 48%, hsl(var(--grad-orange)));
+  border-radius: 9px 16px 9px 16px;
+}
+
+/* ---------- Colorful B2B SaaS: dotted grid, kickers, gradient fills ---------- */
+
+/* Soft dotted texture — subtle structural backdrop (no glow blobs / bubbles). */
+.dot-grid {
+  background-image: radial-gradient(hsl(var(--foreground) / 0.05) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 30%, #000 38%, transparent 100%);
+  mask-image: radial-gradient(80% 70% at 50% 30%, #000 38%, transparent 100%);
+}
+
+/* Section label — clean uppercase kicker (B2B SaaS), colored per section. No pills. */
+.kicker {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Aurora gradient fill — colorful CTAs, accents, panels. */
+.bg-aurora {
+  background-image: linear-gradient(
+    135deg,
+    hsl(var(--grad-blue)),
+    hsl(var(--grad-violet)) 34%,
+    hsl(var(--grad-pink)) 68%,
+    hsl(var(--grad-orange))
+  );
+}
+
+/* Subtle colored top-rule used to accent feature cards. */
+.rule-aurora {
+  background-image: linear-gradient(
+    90deg,
+    hsl(var(--grad-blue)),
+    hsl(var(--grad-pink)) 60%,
+    hsl(var(--grad-orange))
+  );
 }
 
 /* Dropdown / popover open animation — scales + fades from its transform-origin. */
@@ -303,6 +309,16 @@
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hero-progress {
+  0%,
+  100% {
+    width: 58%;
+  }
+  50% {
+    width: 72%;
   }
 }
 

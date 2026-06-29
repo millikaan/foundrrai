@@ -12,7 +12,7 @@ const COLUMNS: ReadonlyArray<{
       { label: "Necə işləyir", href: "#how" },
       { label: "Nümunələr", href: "#showcase" },
       { label: "Şablonlar", href: "#showcase" },
-      { label: "Qiymət", href: "#pricing" },
+      { label: "Qiymət", href: "/pricing" },
     ],
   },
   {
