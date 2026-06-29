@@ -623,7 +623,7 @@ export function BarberSite() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Mail className="h-4 w-4 flex-shrink-0 text-rose-300" />
-                  salam@lumensalon.az
+                  +994 12 408 75 30
                 </li>
               </ul>
             </div>
@@ -631,7 +631,7 @@ export function BarberSite() {
 
           <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-stone-800 pt-6 text-xs text-stone-500 sm:flex-row">
             <span>© 2026 Lümen Salon. Bütün hüquqlar qorunur.</span>
-            <span>lumensalon.az · Bakı, Azərbaycan</span>
+            <span>Bakı, Azərbaycan</span>
           </div>
         </div>
       </footer>

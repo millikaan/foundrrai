@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUp, Plus } from "lucide-react";
 
+import { FoundrrLogo } from "@/components/brand/foundrr-logo";
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/account/profile-menu";
 import { clearSession } from "@/lib/workspace/build-session";
@@ -88,10 +89,9 @@ export function WorkspaceShell({ name, email, credits, plan, sites }: WorkspaceS
   return (
     <div className="flex min-h-screen">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card/40 p-4 md:flex">
-        <div className="flex items-center gap-2 px-2 font-semibold tracking-tight">
-          <span className="brand-mark h-6 w-6 rounded-[7px]" />
-          <span className="text-[17px]">Foundrr</span>
-        </div>
+        <Link href="/" className="px-2">
+          <FoundrrLogo markSize={24} wordmarkClassName="text-[17px]" />
+        </Link>
 
         <Button
           variant="accent"
@@ -180,10 +180,9 @@ export function WorkspaceShell({ name, email, credits, plan, sites }: WorkspaceS
       <main className="relative flex flex-1 flex-col overflow-hidden">
         {/* mobile top bar — the sidebar is desktop-only */}
         <header className="flex items-center justify-between px-5 py-3 md:hidden">
-          <div className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="brand-mark h-6 w-6" />
-            <span className="text-[16px]">Foundrr</span>
-          </div>
+          <Link href="/">
+            <FoundrrLogo markSize={24} wordmarkClassName="text-[16px]" />
+          </Link>
           <div className="flex items-center gap-2">
             <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
               {credits} kredit

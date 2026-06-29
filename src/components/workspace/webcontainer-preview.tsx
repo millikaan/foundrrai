@@ -321,7 +321,7 @@ export function WebContainerPreview({
   return (
     <div className="relative flex h-full items-center justify-center overflow-auto bg-muted/40 p-4">
       <div
-        className="relative h-full overflow-hidden rounded-xl border border-border bg-white shadow-[0_20px_50px_-30px_hsl(240_22%_13%/0.35)] transition-[max-width] duration-300"
+        className="relative h-full overflow-hidden rounded-xl border border-border bg-card shadow-[0_20px_50px_-30px_hsl(var(--foreground)/0.25)] transition-[max-width] duration-300"
         style={{ maxWidth: isMobile ? 390 : "100%", width: "100%" }}
       >
         {url ? (

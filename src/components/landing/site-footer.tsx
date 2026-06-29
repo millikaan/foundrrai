@@ -1,3 +1,4 @@
+import { FoundrrLogo } from "@/components/brand/foundrr-logo";
 import Link from "next/link";
 
 import { Bloom } from "./bloom";
@@ -51,10 +52,7 @@ export function SiteFooter() {
       <div className="relative z-10 mx-auto max-w-[1160px]">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="brand-mark h-6 w-6 rounded-[7px]" />
-              <span className="text-[17px]">Foundrr</span>
-            </div>
+            <FoundrrLogo markSize={24} wordmarkClassName="text-[17px]" />
             <p className="mt-3 max-w-[260px] text-[14px] leading-relaxed text-muted-foreground">
               Azərbaycan üçün AI sayt qurucusu. Fikrindən hazır sayta.
             </p>

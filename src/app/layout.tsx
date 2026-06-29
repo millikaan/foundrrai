@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -38,6 +38,14 @@ export const metadata: Metadata = {
     locale: "az_AZ",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7fbfb" },
+    { media: "(prefers-color-scheme: dark)", color: "#111820" },
+  ],
 };
 
 export default function RootLayout({

@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Loader2, Lock } from "lucide-react";
 
+import { FoundrrLogo } from "@/components/brand/foundrr-logo";
 import { Button } from "@/components/ui/button";
 import { Bloom } from "@/components/landing/bloom";
 import { createClient } from "@/lib/supabase/client";
@@ -55,12 +56,8 @@ export default function ResetPasswordPage() {
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-20">
       <Bloom variant="closing" />
       <div className="relative z-10 w-full max-w-[400px]">
-        <Link
-          href="/"
-          className="flex items-center justify-center gap-2 font-semibold tracking-tight"
-        >
-          <span className="brand-mark h-7 w-7 rounded-lg shadow-[0_6px_18px_-6px_hsl(var(--grad-pink)/0.7)]" />
-          <span className="text-lg">Foundrr</span>
+        <Link href="/" className="flex justify-center font-semibold tracking-tight">
+          <FoundrrLogo markSize={28} wordmarkClassName="text-lg" />
         </Link>
         <h1 className="mt-8 text-center text-[26px] font-semibold tracking-tight">
           Yeni şifrə təyin et

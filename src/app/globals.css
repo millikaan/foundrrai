@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
 /*
   Foundrr design system — inspired by soft prompt-first AI builders, but using
   Foundrr's own cool cyan/teal/blue palette and a more product-led layout.
@@ -40,12 +42,53 @@
   --grad-pink: 176 78% 42%;
   --grad-orange: 152 76% 48%;
 
+  --surface-mid: 190 38% 99%;
+  --surface-end: 0 0% 100%;
+  --preview-canvas: 192 42% 98%;
+  --preview-chrome: 192 30% 97%;
+
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: light;
+    --background: 202 32% 8%;
+    --foreground: 190 22% 94%;
+
+    --card: 202 28% 11%;
+    --card-foreground: 190 22% 94%;
+    --popover: 202 26% 12%;
+    --popover-foreground: 190 22% 94%;
+
+    --muted: 202 22% 14%;
+    --muted-foreground: 190 10% 62%;
+    --secondary: 202 22% 14%;
+    --secondary-foreground: 190 18% 88%;
+
+    --border: 202 18% 19%;
+    --input: 202 18% 19%;
+    --ring: 178 70% 44%;
+
+    --primary: 178 72% 42%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 178 72% 48%;
+    --accent: 205 88% 56%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 68% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --grad-blue: 212 92% 62%;
+    --grad-violet: 190 88% 58%;
+    --grad-pink: 176 74% 46%;
+    --grad-orange: 152 72% 50%;
+
+    --surface-mid: 202 30% 9%;
+    --surface-end: 202 32% 7%;
+    --preview-canvas: 202 26% 12%;
+    --preview-chrome: 202 24% 13%;
+
+    color-scheme: dark;
   }
 }
 
@@ -91,7 +134,12 @@
 
   body {
     background:
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(190 38% 99%) 46%, hsl(0 0% 100%) 100%);
+      linear-gradient(
+        180deg,
+        hsl(var(--background)) 0%,
+        hsl(var(--surface-mid)) 46%,
+        hsl(var(--surface-end)) 100%
+      );
     color: hsl(var(--foreground));
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -103,6 +151,35 @@
   }
 }
 
+/* Hero — visible gradient field on first paint (works with .bloom-hero). */
+.hero-surface {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -8%, hsl(var(--grad-violet) / 0.22), transparent 68%),
+    radial-gradient(ellipse 55% 50% at 0% 45%, hsl(var(--grad-blue) / 0.16), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 100% 45%, hsl(var(--grad-pink) / 0.14), transparent 70%),
+    linear-gradient(
+      180deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--grad-violet) / 0.06) 42%,
+      hsl(var(--background)) 100%
+    );
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero-surface {
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -8%, hsl(var(--grad-violet) / 0.14), transparent 68%),
+      radial-gradient(ellipse 55% 50% at 0% 45%, hsl(var(--grad-blue) / 0.1), transparent 70%),
+      radial-gradient(ellipse 55% 50% at 100% 45%, hsl(var(--grad-pink) / 0.08), transparent 70%),
+      linear-gradient(
+        180deg,
+        hsl(var(--background)) 0%,
+        hsl(var(--grad-violet) / 0.04) 42%,
+        hsl(var(--background)) 100%
+      );
+  }
+}
+
 /* ---------- Signature: vivid gradient blooms (light) ---------- */
 .bloom {
   position: absolute;
@@ -111,21 +188,36 @@
 }
 
 .bloom-hero {
-  inset: 0 0 auto 0;
-  height: 920px;
+  inset: 0;
+  height: 100%;
+  min-height: 720px;
   background:
-    linear-gradient(
-      135deg,
-      hsl(var(--background)) 0%,
-      hsl(var(--grad-blue) / 0.28) 28%,
-      hsl(var(--grad-violet) / 0.42) 55%,
-      hsl(var(--grad-pink) / 0.36) 78%,
-      hsl(var(--background)) 100%
-    ),
-    radial-gradient(62% 48% at 86% 30%, hsl(var(--grad-blue) / 0.52), transparent 64%),
-    radial-gradient(52% 44% at 16% 70%, hsl(var(--grad-orange) / 0.34), transparent 66%),
-    radial-gradient(64% 38% at 76% 92%, hsl(var(--grad-violet) / 0.34), transparent 66%);
-  filter: saturate(118%) blur(30px);
+    hsl(var(--background)),
+    radial-gradient(ellipse 42% 58% at 8% 42%, hsl(var(--grad-blue) / 0.24), transparent 72%),
+    radial-gradient(ellipse 42% 58% at 92% 42%, hsl(var(--grad-violet) / 0.2), transparent 72%),
+    radial-gradient(ellipse 55% 38% at 50% 8%, hsl(var(--grad-pink) / 0.14), transparent 68%),
+    radial-gradient(ellipse 48% 32% at 72% 88%, hsl(var(--grad-orange) / 0.12), transparent 70%);
+  filter: saturate(112%) blur(48px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .bloom-hero {
+    background:
+      hsl(var(--background)),
+      radial-gradient(ellipse 42% 58% at 8% 42%, hsl(var(--grad-blue) / 0.16), transparent 72%),
+      radial-gradient(ellipse 42% 58% at 92% 42%, hsl(var(--grad-violet) / 0.14), transparent 72%),
+      radial-gradient(ellipse 55% 38% at 50% 8%, hsl(var(--grad-pink) / 0.1), transparent 68%),
+      radial-gradient(ellipse 48% 32% at 72% 88%, hsl(var(--grad-orange) / 0.08), transparent 70%);
+    filter: saturate(108%) blur(52px);
+  }
+
+  .bloom-closing {
+    filter: saturate(104%) blur(36px);
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.07) 1px, transparent 1.5px);
+  }
 }
 
 /* Soft brand backdrop for the workspace shell — gentle, not a glow blob */
@@ -162,8 +254,14 @@
 }
 
 .brand-mark {
-  background: linear-gradient(135deg, hsl(var(--grad-blue)), hsl(var(--grad-violet)) 48%, hsl(var(--grad-orange)));
-  border-radius: 9px 16px 9px 16px;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--grad-blue)),
+    hsl(var(--grad-violet)) 42%,
+    hsl(var(--grad-pink)) 72%,
+    hsl(var(--grad-orange))
+  );
+  border-radius: 9999px;
 }
 
 /* ---------- Colorful B2B SaaS: dotted grid, kickers, gradient fills ---------- */
@@ -298,6 +396,48 @@
   }
 }
 
+@keyframes step-timer {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.step-timer-bar {
+  transform-origin: left;
+  animation: step-timer 4.5s linear forwards;
+}
+
+.build-shimmer-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.build-shimmer-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--background) / 0.85),
+    transparent
+  );
+  animation: build-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-timer-bar {
+    animation: none;
+    transform: scaleX(1);
+  }
+  .build-shimmer-line::after {
+    animation: none;
+  }
+}
+
 @keyframes connected-pop {
   0% {
     opacity: 0;
@@ -319,6 +459,83 @@
   }
   50% {
     width: 72%;
+  }
+}
+
+@keyframes cursor-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: cursor-blink 1.05s step-end infinite;
+}
+
+@keyframes demo-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.demo-enter {
+  animation: demo-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes submit-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.submit-pop {
+  animation: submit-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink,
+  .demo-enter,
+  .submit-pop {
+    animation: none;
+  }
+}
+
+.connected-pop {
+  animation: connected-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mock-block-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mock-block-in {
+  animation: mock-block-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mock-block-in {
+    animation: none;
   }
 }
 

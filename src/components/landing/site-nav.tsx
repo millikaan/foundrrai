@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 
+import { FoundrrLogo } from "@/components/brand/foundrr-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ProfileMenu } from "@/components/account/profile-menu";
@@ -47,12 +48,8 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
       )}
     >
       <nav className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-6">
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 font-semibold tracking-tight"
-        >
-          <span className="brand-mark h-5 w-5 shadow-[0_8px_18px_-8px_hsl(var(--grad-violet)/0.8)]" />
-          <span className="text-[18px]">Foundrr</span>
+        <Link href="/" className="font-semibold tracking-tight">
+          <FoundrrLogo markSize={20} wordmarkClassName="text-[18px]" />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

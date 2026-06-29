@@ -479,14 +479,14 @@ export function RestaurantSite() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="h-4 w-4 shrink-0 text-amber-400" />
-                  <span>rezerv@lalezar.az</span>
+                  <span>+994 12 555 01 99</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-stone-500 md:flex-row">
-            <span>© 2026 Laləzar Restoran · lalezar.az</span>
+            <span>© 2026 Laləzar Restoran</span>
             <span>Bütün hüquqlar qorunur</span>
           </div>
         </div>

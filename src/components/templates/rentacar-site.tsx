@@ -533,8 +533,8 @@ export function RentacarSite() {
                     <a href="tel:+994125550199" className="flex items-center gap-3 text-sm text-zinc-200">
                       <Phone className="h-4 w-4 text-zinc-400" /> +994 12 555 01 99
                     </a>
-                    <a href="mailto:salam@sahilrent.az" className="flex items-center gap-3 text-sm text-zinc-200">
-                      <Mail className="h-4 w-4 text-zinc-400" /> salam@sahilrent.az
+                    <a href="tel:+994125508840" className="flex items-center gap-3 text-sm text-zinc-200">
+                      <Mail className="h-4 w-4 text-zinc-400" /> +994 12 550 88 40
                     </a>
                     <div className="flex items-center gap-3 text-sm text-zinc-200">
                       <MapPin className="h-4 w-4 text-zinc-400" /> Nizami küç. 203, Bakı
@@ -705,7 +705,7 @@ export function RentacarSite() {
               <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
                 İcarə şərtləri
               </a>
-              <span className="text-sm text-zinc-500">sahilrent.az</span>
+              <span className="text-sm text-zinc-500">Sahil Rent-a-Car</span>
             </div>
           </div>
         </div>

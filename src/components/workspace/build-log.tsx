@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Check, FileCode2, Loader2 } from "lucide-react";
 
+import { FoundrrLogoMark } from "@/components/brand/foundrr-logo";
 import type { Block } from "@/lib/workspace/build-session";
 import { cn } from "@/lib/utils";
 
@@ -111,8 +112,9 @@ export function BuildLog({ block }: { block: Block }) {
     <div className="rounded-2xl border border-border bg-card p-3.5">
       <div className="flex items-center gap-2 text-[13px] font-medium">
         {running ? (
-          <span className="brand-mark flex h-5 w-5 items-center justify-center rounded-md">
-            <Loader2 className="h-3 w-3 animate-spin text-white" />
+          <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+            <FoundrrLogoMark size={20} className="absolute inset-0" />
+            <Loader2 className="relative h-3 w-3 animate-spin text-white" />
           </span>
         ) : (
           <Check className="h-3.5 w-3.5 text-primary" />

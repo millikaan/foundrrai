@@ -12,7 +12,7 @@ export function ClinicSite() {
             </div>
             <div className="leading-tight">
               <span className="block text-[15px] font-semibold tracking-tight text-slate-900">Dental Gülüm</span>
-              <span className="block text-[11px] font-medium uppercase tracking-[0.18em] text-teal-700">dentalgulum.az</span>
+              <span className="block text-[11px] font-medium uppercase tracking-[0.18em] text-teal-700">Diş klinikası</span>
             </div>
           </div>
           <nav className="hidden items-center gap-8 text-[14px] font-medium text-slate-600 lg:flex">
@@ -302,7 +302,7 @@ export function ClinicSite() {
                     </div>
                     <div>
                       <div className="text-[13px] text-teal-100">E-poçt</div>
-                      <div className="text-[15px] font-semibold">salam@dentalgulum.az</div>
+                      <div className="text-[15px] font-semibold">+994 12 408 75 30</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -433,7 +433,7 @@ export function ClinicSite() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Mail className="h-4 w-4 flex-none text-teal-500" />
-                  <span>salam@dentalgulum.az</span>
+                  <span>+994 12 408 75 30</span>
                 </li>
               </ul>
             </div>

@@ -27,8 +27,8 @@ export function TemplatePreview({ template }: { template: TemplateMeta }) {
           </Link>
           <div className="flex items-center gap-2 text-sm font-medium">
             <span>{template.name}</span>
-            <span className="hidden font-mono text-[12px] text-muted-foreground sm:inline">
-              {template.domain}
+            <span className="hidden rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline">
+              {template.tag}
             </span>
           </div>
           <Link
@@ -49,8 +49,8 @@ export function TemplatePreview({ template }: { template: TemplateMeta }) {
               <span className="h-3 w-3 rounded-full bg-foreground/15" />
               <span className="h-3 w-3 rounded-full bg-foreground/15" />
             </span>
-            <span className="mx-auto rounded-full bg-background px-4 py-1 font-mono text-[12px] text-muted-foreground">
-              {template.domain}
+            <span className="mx-auto text-[12px] font-medium text-muted-foreground">
+              Önizləmə
             </span>
             <span className="w-10" aria-hidden />
           </div>

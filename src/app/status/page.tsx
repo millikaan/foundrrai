@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { FoundrrLogo } from "@/components/brand/foundrr-logo";
 import { getHealthReport } from "@/lib/health/checks";
 import { getUptimeHistory, maybeRecordSnapshot } from "@/lib/health/history";
 import { StatusBoard } from "@/components/status/status-board";
@@ -32,11 +33,9 @@ export default async function StatusPage() {
       <header className="flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          className="transition-opacity hover:opacity-80"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Foundrr" width={28} height={28} className="h-7 w-7" />
-          <span className="text-[15px] font-semibold tracking-tight">Foundrr</span>
+          <FoundrrLogo markSize={28} wordmarkClassName="text-[15px]" />
         </Link>
         <span className="text-[13px] text-muted-foreground">Sistem vəziyyəti</span>
       </header>

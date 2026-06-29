@@ -10,20 +10,21 @@ export type TemplateId =
   | "rentacar"
   | "restaurant"
   | "barber"
-  | "store";
+  | "store"
+  | "cafe"
+  | "gym";
 
 export interface ShowcaseItem {
   id: TemplateId;
   name: string;
-  domain: string;
   tag: string;
   desc: string;
 }
 
-/** The real template site, rendered at desktop width and scaled into the frame. */
+/** Scaled template preview — top-anchored, non-interactive. */
 export function Template({ id }: { id: TemplateId }) {
   return (
-    <SitePreview>
+    <SitePreview designWidth={1280}>
       <TemplateSite id={id} />
     </SitePreview>
   );
@@ -36,33 +37,17 @@ export function BrowserCard({
   item: ShowcaseItem;
   className?: string;
 }) {
-  // The preview renders a real site (which has its own <a> links), so the card
-  // itself must NOT be an <a> — a transparent overlay <Link> handles the click.
   return (
-    <div
-      className={cn(
-        "group relative transition-all duration-300 hover:-translate-y-0.5",
-        className,
-      )}
-    >
-      {/* a real, scaled-down template site as the preview (non-interactive) */}
-      <div className="relative aspect-[16/9] overflow-hidden rounded-[18px] border border-border bg-card shadow-[0_1px_1px_hsl(var(--foreground)/0.04),0_16px_42px_-38px_hsl(var(--foreground)/0.28)] transition-shadow duration-300 group-hover:shadow-[0_1px_1px_hsl(var(--foreground)/0.04),0_22px_54px_-40px_hsl(var(--foreground)/0.34)]">
+    <div className={cn("group relative min-w-0", className)}>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[10px] bg-muted/30 transition-shadow duration-300 group-hover:shadow-[0_12px_32px_-24px_hsl(var(--foreground)/0.28)] md:rounded-xl">
         <Template id={item.id} />
-        <span className="absolute bottom-1.5 right-2 z-10 rounded-md bg-[hsl(var(--foreground)/0.72)] px-1.5 py-0.5 font-mono text-[9px] text-background backdrop-blur-sm">
-          {item.domain}
-        </span>
       </div>
 
-      <div className="pt-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[16px] font-semibold tracking-tight text-foreground">
-            {item.name}
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground max-sm:hidden">
-            {item.tag}
-          </span>
-        </div>
-        <p className="mt-1 text-[14px] font-medium leading-relaxed text-muted-foreground">
+      <div className="pointer-events-none pt-2 md:pt-2.5">
+        <p className="truncate text-[12px] font-semibold tracking-tight text-foreground md:text-[14px]">
+          {item.name}
+        </p>
+        <p className="mt-0.5 line-clamp-1 text-[10px] leading-snug text-muted-foreground md:text-[12px]">
           {item.desc}
         </p>
       </div>
@@ -70,7 +55,7 @@ export function BrowserCard({
       <Link
         href={`/templates/${item.id}`}
         aria-label={item.name}
-        className="absolute inset-0 z-20"
+        className="absolute inset-0 z-10 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:rounded-xl"
       />
     </div>
   );

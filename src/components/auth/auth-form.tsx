@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Loader2, Lock, Mail } from "lucide-react";
 
+import { FoundrrLogo, FoundrrLogoMark } from "@/components/brand/foundrr-logo";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
@@ -126,7 +127,7 @@ export function AuthForm({ mode, next = "/workspace" }: AuthFormProps) {
   if (resetSent) {
     return (
       <div className="w-full max-w-[400px] text-center">
-        <span className="brand-mark mx-auto block h-7 w-7 rounded-lg" />
+        <FoundrrLogoMark size={28} className="mx-auto" />
         <h1 className="mt-8 text-[24px] font-semibold tracking-tight">E-poçtunu yoxla</h1>
         <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
           <span className="font-medium text-foreground">{email}</span> ünvanına şifrə
@@ -148,12 +149,8 @@ export function AuthForm({ mode, next = "/workspace" }: AuthFormProps) {
   if (view === "forgot") {
     return (
       <div className="w-full max-w-[400px]">
-        <Link
-          href="/"
-          className="flex items-center justify-center gap-2 font-semibold tracking-tight"
-        >
-          <span className="brand-mark h-7 w-7 rounded-lg shadow-[0_6px_18px_-6px_hsl(var(--grad-pink)/0.7)]" />
-          <span className="text-lg">Foundrr</span>
+        <Link href="/" className="flex justify-center font-semibold tracking-tight">
+          <FoundrrLogo markSize={28} wordmarkClassName="text-lg" />
         </Link>
         <h1 className="mt-8 text-center text-[26px] font-semibold tracking-tight">
           Şifrəni sıfırla
@@ -209,12 +206,8 @@ export function AuthForm({ mode, next = "/workspace" }: AuthFormProps) {
 
   return (
     <div className="w-full max-w-[400px]">
-      <Link
-        href="/"
-        className="flex items-center justify-center gap-2 font-semibold tracking-tight"
-      >
-        <span className="brand-mark h-7 w-7 rounded-lg shadow-[0_6px_18px_-6px_hsl(var(--grad-pink)/0.7)]" />
-        <span className="text-lg">Foundrr</span>
+      <Link href="/" className="flex justify-center font-semibold tracking-tight">
+        <FoundrrLogo markSize={28} wordmarkClassName="text-lg" />
       </Link>
 
       <h1 className="mt-8 text-center text-[26px] font-semibold tracking-tight">

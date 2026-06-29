@@ -490,7 +490,7 @@ export function FloristSite() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-rose-200" />
-                  salam@gulevi.az
+                  +994 12 488 55 20
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-4 w-4 text-rose-200" />
@@ -673,7 +673,7 @@ export function FloristSite() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Mail className="h-4 w-4 text-rose-400" />
-                  salam@gulevi.az
+                  +994 12 488 55 20
                 </li>
                 <li className="flex items-start gap-2.5">
                   <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-400" />
@@ -705,7 +705,7 @@ export function FloristSite() {
 
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-100 pt-8 sm:flex-row">
             <p className="text-sm text-stone-400">
-              © 2024 Gül Evi · gulevi.az · Bütün hüquqlar qorunur
+              © 2024 Gül Evi · Bütün hüquqlar qorunur
             </p>
             <div className="flex items-center gap-6 text-sm text-stone-400">
               <a href="#" className="transition-colors hover:text-rose-500">

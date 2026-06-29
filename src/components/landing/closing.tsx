@@ -1,3 +1,4 @@
+import { FoundrrLogo, FoundrrLogoMark } from "@/components/brand/foundrr-logo";
 import Link from "next/link";
 
 import { PromptBox } from "./prompt-box";
@@ -73,10 +74,7 @@ export function Closing() {
       <footer className="relative z-10 mx-auto mt-[120px] max-w-[1180px] rounded-t-[22px] bg-card px-8 pb-12 pt-16 sm:px-10 lg:px-12">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.35fr_1fr_1fr_1fr_1fr]">
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="brand-mark h-7 w-7" />
-              <span className="text-[17px]">Foundrr</span>
-            </div>
+            <FoundrrLogo markSize={28} wordmarkClassName="text-[17px]" />
             <p className="mt-3 max-w-[260px] text-[14px] leading-relaxed text-muted-foreground">
               Azərbaycan üçün AI sayt qurucusu. Fikrindən hazır sayta.
             </p>

@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 
+import { FoundrrLogoMark } from "@/components/brand/foundrr-logo";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import {
@@ -1035,7 +1036,10 @@ export function ProjectBuilder({
             className="group inline-flex items-center rounded-full p-1 transition-colors"
           >
             <span className="relative flex h-6 w-6 items-center justify-center">
-              <span className="brand-mark absolute inset-0 rounded-[7px] transition-opacity group-hover:opacity-0" />
+              <FoundrrLogoMark
+                size={24}
+                className="absolute inset-0 transition-opacity group-hover:opacity-0"
+              />
               <ArrowLeft className="relative h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             </span>
           </button>

@@ -1,197 +1,106 @@
 "use client";
 
 import * as React from "react";
-import { ArrowUp, Check, Globe2, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { ArrowUp, Loader2, Paperclip, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
 
-const PHASES = [
+const STEPS = [
   {
-    title: "Fikir yazılır",
-    body: "Bir cümləlik ideya Foundrr-a verilir.",
+    title: "Fikrini təsvir et",
+    body: "Biznesini bir cümlə ilə təsvir et — Azərbaycan dilində, öz sözlərinlə.",
   },
   {
-    title: "Foundrr işə düşür",
-    body: "Sahə, dil və lazım olan bölmələr oxunur.",
+    title: "Canlı qurulmasına bax",
+    body: "Foundrr ideyanı real vaxtda tam sayta çevirir — sən izlə, o qurur.",
   },
   {
-    title: "Sayt hazırlanır",
-    body: "Məzmun, struktur və dizayn eyni anda yığılır.",
-  },
-  {
-    title: "Sayt yaradıldı",
-    body: "Hazır nəticəni önizlə və öz hesabında yayımla.",
+    title: "Hazır sayt",
+    body: "Tam sayt önizləmədə hazırdır — düzəliş et və öz hesabına yayımla.",
   },
 ] as const;
 
 const PROMPT = "Gözəllik salonu üçün onlayn növbə saytı";
-const CYCLE_MS = 3000;
+
+const SITE = {
+  brand: "Art & Smile",
+  tagline: "Gözəllik salonu",
+  heroTitle: "Gözəlliyiniz üçün onlayn növbə",
+  heroSub: "Saç, dırnaq və makiyaj xidmətləri — bir kliklə vaxt seçin.",
+  cta: "Növbə al",
+  services: [
+    { name: "Saç stil", price: "35 ₼" },
+    { name: "Manikür", price: "25 ₼" },
+    { name: "Makiyaj", price: "45 ₼" },
+  ],
+  phone: "+994 12 408 75 30",
+  address: "Nizami küç. 96, Bakı",
+} as const;
+
+const SAFETY_MS = [9000, 9000, 6500] as const;
+
+/** 0 = empty … 8 = full site */
+type BuildLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export function HowItWorks() {
   const [active, setActive] = React.useState(0);
-  const [typed, setTyped] = React.useState("");
-  const reduceMotion = React.useRef(false);
+  const [paused, setPaused] = React.useState(false);
+  const [reduceMotion, setReduceMotion] = React.useState(false);
+  const [loopGen, setLoopGen] = React.useState(0);
 
-  React.useEffect(() => {
-    reduceMotion.current = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reduceMotion.current) {
-      setActive(3);
-      setTyped(PROMPT);
-    }
+  const advance = React.useCallback(() => {
+    setActive((current) => {
+      const next = (current + 1) % STEPS.length;
+      if (current === STEPS.length - 1 && next === 0) {
+        setLoopGen((generation) => generation + 1);
+      }
+      return next;
+    });
   }, []);
 
   React.useEffect(() => {
-    if (reduceMotion.current) return;
-
-    const timer = window.setTimeout(() => {
-      setActive((current) => (current + 1) % PHASES.length);
-    }, CYCLE_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [active]);
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    setReduceMotion(prefersReduced);
+    if (prefersReduced) setActive(STEPS.length - 1);
+  }, []);
 
   React.useEffect(() => {
-    if (active !== 0) {
-      setTyped(PROMPT);
-      return;
-    }
-
-    setTyped("");
-    let char = 0;
-    const timer = window.setInterval(() => {
-      char += 1;
-      setTyped(PROMPT.slice(0, char));
-      if (char >= PROMPT.length) {
-        window.clearInterval(timer);
-      }
-    }, 42);
-
-    return () => window.clearInterval(timer);
-  }, [active]);
+    if (reduceMotion || paused) return;
+    const safety = window.setTimeout(advance, SAFETY_MS[active]);
+    return () => window.clearTimeout(safety);
+  }, [active, paused, reduceMotion, advance]);
 
   return (
     <section
       id="how"
-      className="relative overflow-hidden px-5 py-20 sm:px-6 sm:py-24 lg:py-28"
+      className="relative px-5 py-20 sm:px-6 sm:py-24 lg:py-28"
     >
-      <div className="dot-grid pointer-events-none absolute inset-x-0 top-0 h-[520px] opacity-18" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-20 mx-auto h-56 max-w-[860px] rounded-[100%] bg-[radial-gradient(60%_70%_at_50%_50%,hsl(var(--primary)/0.13),transparent_72%)] blur-2xl"
-      />
-
       <div className="relative mx-auto max-w-[1120px]">
-        <Reveal className="mx-auto max-w-[680px] text-center">
+        <Reveal>
           <h2
-            className="text-balance font-semibold tracking-tight text-foreground"
-            style={{ fontSize: "clamp(34px, 4.5vw, 56px)", lineHeight: 1.04 }}
+            className="font-semibold tracking-tight text-foreground"
+            style={{ fontSize: "clamp(36px, 5.2vw, 56px)", lineHeight: 1.04 }}
           >
-            Foundrr ilə <span className="text-aurora">tanış ol</span>
+            Necə işləyir
           </h2>
-          <p className="mx-auto mt-4 max-w-[540px] text-[16px] font-medium leading-relaxed text-foreground/62">
-            Bir fikir yazılır, Foundrr onu anlayır, sayt hazırlanır və sonda
-            canlı nəticə yaranır.
-          </p>
         </Reveal>
 
-        <Reveal className="mt-12">
-          <div className="relative overflow-hidden rounded-[32px] border border-border/80 bg-background/78 p-3 shadow-[0_34px_100px_-76px_hsl(var(--foreground)/0.42),0_1px_0_hsl(var(--background)/0.9)_inset] backdrop-blur-sm sm:p-4">
-            <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-              {PHASES.map((phase, index) => (
-                <button
-                  key={phase.title}
-                  type="button"
-                  aria-current={active === index}
-                  onClick={() => setActive(index)}
-                  onMouseEnter={() => setActive(index)}
-                  className={cn(
-                    "rounded-2xl border p-2.5 text-left transition-all duration-300 sm:p-3",
-                    active === index
-                      ? "border-primary/30 bg-primary/8 shadow-[0_16px_34px_-30px_hsl(var(--primary)/0.65)]"
-                      : "border-transparent bg-background/45 hover:border-border hover:bg-background/75",
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-full border font-mono text-[11px] font-semibold",
-                        active === index
-                          ? "border-primary/25 bg-primary/10 text-primary"
-                          : "border-border bg-background text-muted-foreground",
-                      )}
-                    >
-                      0{index + 1}
-                    </span>
-                    <span className="text-[13px] font-semibold text-foreground">
-                      {phase.title}
-                    </span>
-                  </span>
-                  <span className="mt-2 hidden text-[12px] font-medium leading-relaxed text-foreground/55 sm:block">
-                    {phase.body}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-3 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
-              <div className="order-2 rounded-[26px] border border-border bg-background/80 p-5 sm:p-6 lg:order-1">
-                <p className="text-[13px] font-semibold uppercase tracking-[0.16em] text-primary/80">
-                  Canlı axın
-                </p>
-                <h3 className="mt-4 text-[30px] font-semibold leading-none tracking-tight text-foreground sm:text-[36px]">
-                  {PHASES[active].title}
-                </h3>
-                <p className="mt-4 text-[15px] font-medium leading-relaxed text-foreground/62">
-                  {PHASES[active].body}
-                </p>
-
-                <div className="mt-7 grid gap-2">
-                  {PHASES.map((phase, index) => (
-                    <div
-                      key={phase.title}
-                      className={cn(
-                        "flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition-all duration-300",
-                        active === index
-                          ? "border-primary/25 bg-primary/8 text-foreground"
-                          : active > index
-                            ? "border-transparent bg-primary/5 text-foreground/70"
-                            : "border-border/70 bg-background text-foreground/45",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "flex h-7 w-7 items-center justify-center rounded-full",
-                          active > index
-                            ? "bg-primary text-primary-foreground"
-                            : active === index
-                              ? "bg-primary/10 text-primary"
-                              : "bg-muted text-muted-foreground",
-                        )}
-                      >
-                        {active > index ? (
-                          <Check className="h-3.5 w-3.5" />
-                        ) : active === index ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                        )}
-                      </span>
-                      <span className="text-[13px] font-semibold">
-                        {phase.title}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="order-1 relative min-h-[430px] overflow-hidden rounded-[26px] border border-border bg-[linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.55))] p-4 sm:p-5 lg:order-2">
-                <AnimatedPanel active={active} typed={typed} />
-              </div>
-            </div>
+        <Reveal className="mt-10 lg:mt-14">
+          <div
+            className="grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 xl:gap-20"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
+            <DemoPanel
+              active={active}
+              loopGen={loopGen}
+              paused={paused}
+              onPhaseComplete={advance}
+            />
+            <StepList active={active} onSelect={setActive} />
           </div>
         </Reveal>
       </div>
@@ -199,39 +108,119 @@ export function HowItWorks() {
   );
 }
 
-function AnimatedPanel({ active, typed }: { active: number; typed: string }) {
+function StepList({
+  active,
+  onSelect,
+}: {
+  active: number;
+  onSelect: (index: number) => void;
+}) {
   return (
-    <div className="relative h-full min-h-[390px]">
-      <PhaseLayer active={active === 0}>
-        <PromptStage typed={typed} />
-      </PhaseLayer>
-      <PhaseLayer active={active === 1}>
-        <CallStage />
-      </PhaseLayer>
-      <PhaseLayer active={active === 2}>
-        <BuildStage />
-      </PhaseLayer>
-      <PhaseLayer active={active === 3}>
-        <CreatedStage />
-      </PhaseLayer>
+    <ol className="flex flex-col lg:pt-2">
+      {STEPS.map((step, index) => {
+        const isActive = active === index;
+
+        return (
+          <li key={step.title}>
+            <button
+              type="button"
+              aria-current={isActive}
+              onClick={() => onSelect(index)}
+              className="group w-full py-6 text-left sm:py-8"
+            >
+              <p
+                className={cn(
+                  "font-semibold tracking-[-0.025em] transition-colors duration-500",
+                  isActive
+                    ? "text-foreground"
+                    : "text-foreground/44 group-hover:text-foreground/56",
+                )}
+                style={{
+                  fontSize: "clamp(26px, 2.6vw, 36px)",
+                  lineHeight: 1.14,
+                }}
+              >
+                {step.title}
+              </p>
+              <p
+                className={cn(
+                  "mt-3 max-w-[380px] text-[16px] font-normal leading-[1.55] transition-colors duration-500 sm:text-[17px]",
+                  isActive
+                    ? "text-foreground"
+                    : "text-foreground/44 group-hover:text-foreground/52",
+                )}
+              >
+                {step.body}
+              </p>
+            </button>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function DemoPanel({
+  active,
+  loopGen,
+  paused,
+  onPhaseComplete,
+}: {
+  active: number;
+  loopGen: number;
+  paused: boolean;
+  onPhaseComplete: () => void;
+}) {
+  const completeRef = React.useRef(onPhaseComplete);
+  completeRef.current = onPhaseComplete;
+
+  const complete = React.useCallback(() => {
+    if (!paused) completeRef.current();
+  }, [paused]);
+
+  return (
+    <div className="rounded-[28px] bg-card/90 p-5 sm:p-7 lg:p-9">
+      <div className="relative min-h-[340px] sm:min-h-[380px]">
+        <Phase show={active === 0}>
+          <PromptDemo
+            key={`prompt-${loopGen}`}
+            play={active === 0}
+            onComplete={complete}
+          />
+        </Phase>
+        <Phase show={active === 1}>
+          <BuildDemo
+            key={`build-${loopGen}`}
+            play={active === 1}
+            onComplete={complete}
+          />
+        </Phase>
+        <Phase show={active === 2}>
+          <FinishedDemo
+            key={`finished-${loopGen}`}
+            play={active === 2}
+            onComplete={complete}
+          />
+        </Phase>
+      </div>
     </div>
   );
 }
 
-function PhaseLayer({
-  active,
+function Phase({
+  show,
   children,
 }: {
-  active: boolean;
+  show: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
       className={cn(
-        "absolute inset-0 transition-all duration-500 ease-out",
-        active
-          ? "translate-y-0 opacity-100"
-          : "pointer-events-none translate-y-4 opacity-0",
+        "absolute inset-0 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        show
+          ? "z-10 translate-y-0 scale-100 opacity-100"
+          : "pointer-events-none z-0 translate-y-3 scale-[0.98] opacity-0",
       )}
     >
       {children}
@@ -239,161 +228,414 @@ function PhaseLayer({
   );
 }
 
-function PromptStage({ typed }: { typed: string }) {
+function PromptDemo({
+  play,
+  onComplete,
+}: {
+  play: boolean;
+  onComplete: () => void;
+}) {
+  const [typed, setTyped] = React.useState("");
+  const [ready, setReady] = React.useState(false);
+  const [submitPulse, setSubmitPulse] = React.useState(false);
+  const doneRef = React.useRef(false);
+  const completeRef = React.useRef(onComplete);
+  completeRef.current = onComplete;
+
+  React.useEffect(() => {
+    doneRef.current = false;
+    if (!play) {
+      setTyped("");
+      setReady(false);
+      setSubmitPulse(false);
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setTyped(PROMPT);
+      setReady(true);
+      const timer = window.setTimeout(() => completeRef.current(), 1200);
+      return () => window.clearTimeout(timer);
+    }
+
+    setTyped("");
+    setReady(false);
+    let char = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const finish = () => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      setSubmitPulse(true);
+      window.setTimeout(() => setSubmitPulse(false), 550);
+      timer = window.setTimeout(() => completeRef.current(), 900);
+    };
+
+    const tick = () => {
+      char += 1;
+      setTyped(PROMPT.slice(0, char));
+      setReady(char > 8);
+
+      if (char >= PROMPT.length) {
+        finish();
+        return;
+      }
+
+      timer = window.setTimeout(tick, 36 + Math.random() * 28);
+    };
+
+    timer = window.setTimeout(tick, 320);
+    return () => window.clearTimeout(timer);
+  }, [play]);
+
   return (
-    <div className="flex h-full min-h-[390px] items-center justify-center">
-      <div className="w-full max-w-[560px] rounded-[28px] border border-border bg-background p-5 shadow-[0_24px_70px_-54px_hsl(var(--primary)/0.55)]">
-        <div className="min-h-[132px] rounded-2xl border border-border bg-muted/35 p-5">
-          <p className="text-[18px] font-semibold leading-relaxed text-foreground/78">
+    <div className="demo-enter w-full max-w-[520px] rounded-[26px] border border-border/70 bg-background p-5 shadow-[0_1px_2px_hsl(var(--foreground)/0.04),0_24px_60px_-38px_hsl(var(--foreground)/0.2)] sm:p-6">
+      <p className="min-h-[88px] text-[16px] font-medium leading-relaxed text-foreground/82 sm:min-h-[100px] sm:text-[17px]">
+        {typed.length > 0 ? (
+          <>
             {typed}
-          </p>
-        </div>
-        <div className="mt-4 flex items-center justify-between">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="cursor-blink ml-0.5 inline-block h-[18px] w-[2px] bg-primary align-middle" />
+          </>
+        ) : null}
+      </p>
+
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <div
+          className={cn(
+            "flex items-center gap-2 transition-all duration-500",
+            ready ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
+          )}
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)]">
+            <Plus className="h-4 w-4" />
           </span>
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_12px_22px_-14px_hsl(var(--primary)/0.9)]">
-            <ArrowUp className="h-5 w-5" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)]">
+            <Paperclip className="h-3.5 w-3.5" />
+            Əlavə et
           </span>
         </div>
+
+        <span
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background shadow-[0_10px_24px_-14px_hsl(var(--foreground)/0.55)] transition-all duration-500",
+            ready ? "translate-y-0 opacity-100" : "translate-y-1 opacity-40",
+            submitPulse && "submit-pop",
+          )}
+        >
+          <ArrowUp className="h-4 w-4" />
+        </span>
       </div>
     </div>
   );
 }
 
-function CallStage() {
-  return (
-    <div className="flex h-full min-h-[390px] items-center justify-center">
-      <div className="w-full max-w-[560px] rounded-[28px] border border-border bg-background p-5 shadow-[0_24px_70px_-54px_hsl(var(--primary)/0.55)]">
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Wand2 className="h-5 w-5" />
-          </span>
-          <div>
-            <p className="text-[18px] font-semibold text-foreground">
-              Foundrr işə düşdü
-            </p>
-            <p className="mt-1 text-[13px] font-medium text-foreground/55">
-              Sorğu qəbul edildi və analiz başladı
-            </p>
-          </div>
-        </div>
+function BuildDemo({
+  play,
+  onComplete,
+}: {
+  play: boolean;
+  onComplete: () => void;
+}) {
+  const [level, setLevel] = React.useState<BuildLevel>(0);
+  const doneRef = React.useRef(false);
+  const completeRef = React.useRef(onComplete);
+  completeRef.current = onComplete;
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {["Sahə", "Dil", "Bölmələr"].map((item, index) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-border bg-muted/30 p-4 text-center"
-            >
-              <span
-                className={cn(
-                  "mx-auto block h-3 w-3 rounded-full bg-primary",
-                  index === 1 && "animate-pulse",
-                )}
-              />
-              <p className="mt-3 text-[13px] font-semibold text-foreground/70">
-                {item} tanındı
+  React.useEffect(() => {
+    doneRef.current = false;
+    if (!play) {
+      setLevel(0);
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setLevel(8);
+      const timer = window.setTimeout(() => completeRef.current(), 1200);
+      return () => window.clearTimeout(timer);
+    }
+
+    setLevel(0);
+    const delays = [180, 420, 720, 1050, 1350, 1750, 2150, 2550];
+    const timers = delays.map((delay, index) =>
+      window.setTimeout(() => setLevel((index + 1) as BuildLevel), delay),
+    );
+    const finish = window.setTimeout(() => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      completeRef.current();
+    }, 3800);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      window.clearTimeout(finish);
+    };
+  }, [play]);
+
+  return (
+    <PreviewFrame building className="demo-enter">
+      <MockSite level={level} />
+      <BuildStatus level={level} />
+    </PreviewFrame>
+  );
+}
+
+function FinishedDemo({
+  play,
+  onComplete,
+}: {
+  play: boolean;
+  onComplete: () => void;
+}) {
+  const completeRef = React.useRef(onComplete);
+  completeRef.current = onComplete;
+
+  React.useEffect(() => {
+    if (!play) return;
+    const timer = window.setTimeout(() => completeRef.current(), 4200);
+    return () => window.clearTimeout(timer);
+  }, [play]);
+
+  return (
+    <PreviewFrame ready className="demo-enter">
+      <MockSite level={8} polished />
+    </PreviewFrame>
+  );
+}
+
+function PreviewFrame({
+  building = false,
+  ready = false,
+  className,
+  children,
+}: {
+  building?: boolean;
+  ready?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "w-full overflow-hidden rounded-[22px] border border-border/70 bg-background shadow-[0_1px_0_hsl(var(--background)/0.9)_inset,0_32px_90px_-52px_hsl(var(--foreground)/0.3)]",
+        className,
+      )}
+    >
+      <BrowserChrome building={building} ready={ready} />
+
+      <div className="relative aspect-[4/3] w-full min-h-[260px] overflow-hidden bg-[hsl(var(--preview-canvas))] sm:min-h-[300px]">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function BrowserChrome({
+  building = false,
+  ready = false,
+}: {
+  building?: boolean;
+  ready?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between border-b border-border/60 bg-[hsl(var(--preview-chrome))] px-4 py-3">
+      <div className="flex items-center gap-1.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/90" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/90" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/90" />
+      </div>
+
+      <span className="text-[11px] font-medium tracking-wide text-muted-foreground">
+        Önizləmə
+      </span>
+
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">
+        <span
+          className={cn(
+            "h-1.5 w-1.5 rounded-full",
+            ready
+              ? "bg-[#28c840]"
+              : building
+                ? "animate-pulse bg-primary"
+                : "bg-muted-foreground/40",
+          )}
+        />
+        {ready ? "Hazır" : building ? "Qurulur" : "Gözləyir"}
+      </span>
+    </div>
+  );
+}
+
+function BuildStatus({ level }: { level: BuildLevel }) {
+  const label =
+    level <= 2
+      ? "Məzmun yaradılır..."
+      : level <= 5
+        ? "Bölmələr əlavə olunur..."
+        : "Son toxunuşlar...";
+
+  if (level === 0 || level >= 8) return null;
+
+  return (
+    <div className="absolute bottom-4 left-4 z-20">
+      <span className="inline-flex items-center gap-2 rounded-full bg-foreground/90 px-3.5 py-2 text-[12px] font-semibold text-background shadow-[0_14px_36px_-18px_hsl(var(--foreground)/0.6)] backdrop-blur-sm">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function MockSite({
+  level,
+  polished = false,
+}: {
+  level: BuildLevel;
+  polished?: boolean;
+}) {
+  const showNav = level >= 1;
+  const showHero = level >= 2;
+  const showHeroTitle = level >= 3;
+  const showHeroSub = level >= 4;
+  const showHeroCta = level >= 4;
+  const showServices = level >= 5;
+  const showBooking = level >= 6;
+  const showContact = level >= 7;
+  const showShimmer = level > 0 && level < 2;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {showShimmer ? (
+        <div
+          aria-hidden
+          className="build-shimmer-line pointer-events-none absolute inset-0 z-10 opacity-35"
+        />
+      ) : null}
+
+      <div className="absolute inset-0 overflow-y-auto px-4 pb-5 pt-4 sm:px-5 sm:pt-5">
+        {showNav ? (
+          <header className={cn("mb-4 flex items-center justify-between", "mock-block-in")}>
+            <div>
+              <p className="text-[13px] font-semibold tracking-tight text-foreground">
+                {SITE.brand}
+              </p>
+              <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                {SITE.tagline}
               </p>
             </div>
-          ))}
-        </div>
+            <nav className="flex gap-3">
+              {["Xidmətlər", "Növbə", "Əlaqə"].map((link) => (
+                <span
+                  key={link}
+                  className="text-[10px] font-medium text-foreground/55"
+                >
+                  {link}
+                </span>
+              ))}
+            </nav>
+          </header>
+        ) : null}
 
-        <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/7 p-4">
-          <p className="text-[14px] font-semibold text-primary">
-            Gözəllik salonu üçün uyğun sayt strukturu seçilir
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BuildStage() {
-  return (
-    <div className="flex h-full min-h-[390px] items-center justify-center">
-      <div className="w-full max-w-[600px] rounded-[28px] border border-border bg-background p-5 shadow-[0_24px_70px_-54px_hsl(var(--primary)/0.55)]">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        {showHero ? (
           <div
-            className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full"
-            style={{
-              background:
-                "conic-gradient(hsl(var(--primary)) 0 76%, hsl(var(--muted)) 76% 100%)",
-            }}
+            className={cn(
+              "relative overflow-hidden rounded-2xl bg-aurora mock-block-in",
+              polished &&
+                "shadow-[0_20px_50px_-28px_hsl(var(--primary)/0.55)] ring-1 ring-primary/10",
+            )}
           >
-            <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-background text-[24px] font-semibold text-primary">
-              76%
-            </div>
-          </div>
-          <div>
-            <p className="text-[24px] font-semibold tracking-tight text-foreground">
-              Sayt hazırlanır
-            </p>
-            <p className="mt-2 max-w-[340px] text-[14px] font-medium leading-relaxed text-foreground/60">
-              Foundrr mətnləri, bölmələri və vizual üslubu eyni axında yığır.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {["Ana səhifə", "Xidmətlər", "Randevu", "Əlaqə"].map((item, index) => (
-            <div
-              key={item}
-              className="flex items-center justify-between rounded-2xl border border-border bg-muted/30 p-4"
-            >
-              <span className="text-[14px] font-semibold text-foreground/70">
-                {item}
-              </span>
-              {index < 3 ? (
-                <Check className="h-4 w-4 text-primary" />
+            <div className="flex min-h-[112px] flex-col justify-end p-4 sm:min-h-[128px] sm:p-5">
+              {showHeroTitle ? (
+                <h3
+                  className="mock-block-in max-w-[90%] text-[15px] font-semibold leading-snug text-background sm:text-[17px]"
+                  style={{ animationDelay: "60ms" }}
+                >
+                  {SITE.heroTitle}
+                </h3>
               ) : (
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <div className="h-4 w-[58%] rounded-full bg-background/30" />
               )}
+
+              {showHeroSub ? (
+                <p
+                  className="mock-block-in mt-2 max-w-[85%] text-[10px] leading-relaxed text-background/88 sm:text-[11px]"
+                  style={{ animationDelay: "120ms" }}
+                >
+                  {SITE.heroSub}
+                </p>
+              ) : showHeroTitle ? (
+                <div className="mt-2.5 h-2.5 w-[70%] rounded-full bg-background/22" />
+              ) : null}
+
+              {showHeroCta ? (
+                <span
+                  className="mock-block-in mt-3 inline-flex w-fit rounded-full bg-background px-3.5 py-1.5 text-[10px] font-semibold text-foreground shadow-sm sm:text-[11px]"
+                  style={{ animationDelay: "180ms" }}
+                >
+                  {SITE.cta}
+                </span>
+              ) : null}
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+          </div>
+        ) : null}
 
-function CreatedStage() {
-  return (
-    <div className="flex h-full min-h-[390px] items-center justify-center">
-      <div className="w-full max-w-[620px] overflow-hidden rounded-[28px] border border-border bg-background shadow-[0_24px_70px_-54px_hsl(var(--primary)/0.55)]">
-        <div className="flex items-center justify-between border-b border-border bg-muted/35 px-4 py-3">
-          <span className="inline-flex items-center gap-2 text-[13px] font-semibold text-primary">
-            <Globe2 className="h-4 w-4" />
-            artandsmile.az
-          </span>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-[12px] font-semibold text-primary">
-            Yaradıldı
-          </span>
-        </div>
-
-        <div className="relative overflow-hidden p-5">
-          <div className="rounded-3xl bg-[linear-gradient(135deg,hsl(var(--foreground))_0%,hsl(var(--foreground)/0.78)_58%,hsl(var(--primary)/0.75)_100%)] p-6 text-background">
-            <p className="text-[13px] font-semibold text-background/70">
-              Gözəllik salonu
+        {showServices ? (
+          <section className="mock-block-in mt-4" style={{ animationDelay: "40ms" }}>
+            <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Xidmətlər
             </p>
-            <h4 className="mt-10 max-w-[360px] text-[34px] font-semibold leading-none tracking-tight">
-              Gözəlliyiniz üçün hazır sayt
-            </h4>
-            <div className="mt-8 inline-flex rounded-full bg-background px-4 py-2 text-[13px] font-semibold text-foreground">
-              Canlı önizlə
+            <div className="grid grid-cols-3 gap-2">
+              {SITE.services.map((service) => (
+                <div
+                  key={service.name}
+                  className="rounded-xl border border-border/60 bg-background p-2.5 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] sm:p-3"
+                >
+                  <div className="mb-2 h-7 w-7 rounded-lg bg-primary/12" />
+                  <p className="text-[10px] font-semibold text-foreground/85 sm:text-[11px]">
+                    {service.name}
+                  </p>
+                  <p className="mt-0.5 text-[9px] font-medium text-primary sm:text-[10px]">
+                    {service.price}
+                  </p>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
+        ) : null}
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {["Hero", "Xidmətlər", "Online növbə"].map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl border border-border bg-muted/30 p-4 text-[13px] font-semibold text-foreground/70"
-              >
-                {item}
+        {showBooking ? (
+          <section
+            className="mock-block-in mt-3 rounded-xl border border-border/60 bg-background p-3 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] sm:mt-4 sm:p-3.5"
+            style={{ animationDelay: "40ms" }}
+          >
+            <p className="text-[11px] font-semibold text-foreground">Onlayn növbə</p>
+            <div className="mt-2.5 space-y-2">
+              <div className="h-7 rounded-lg border border-border/50 bg-muted/30 px-2.5 py-1.5 text-[9px] text-muted-foreground">
+                Ad, soyad
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="h-7 rounded-lg border border-border/50 bg-muted/30 px-2.5 py-1.5 text-[9px] text-muted-foreground">
+                Tarix və saat
+              </div>
+            </div>
+            <div className="mt-2.5 inline-flex rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground">
+              Təsdiqlə
+            </div>
+          </section>
+        ) : null}
+
+        {showContact ? (
+          <section
+            className="mock-block-in mt-3 space-y-1 sm:mt-4"
+            style={{ animationDelay: "40ms" }}
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Əlaqə
+            </p>
+            <p className="text-[10px] text-foreground/70 sm:text-[11px]">{SITE.address}</p>
+            <p className="text-[10px] font-medium text-foreground/80 sm:text-[11px]">
+              {SITE.phone}
+            </p>
+          </section>
+        ) : null}
       </div>
     </div>
   );

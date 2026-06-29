@@ -3,7 +3,6 @@ import type { TemplateId } from "@/components/landing/browser-card";
 export interface TemplateMeta {
   id: TemplateId;
   name: string;
-  domain: string;
   tag: string;
   desc: string;
   /** The build brief used when a visitor remixes this template. */
@@ -15,7 +14,6 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "rentacar",
     name: "Sahil Rent-a-Car",
-    domain: "sahilrent.az",
     tag: "İcarə",
     desc: "Avtomobil icarəsi — premium avtopark və onlayn rezervasiya.",
     prompt:
@@ -24,7 +22,6 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "restaurant",
     name: "Laləzar Restoran",
-    domain: "lalezar.az",
     tag: "Restoran",
     desc: "Restoran — menyu, qalereya və masa rezervasiyası.",
     prompt:
@@ -33,7 +30,6 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "barber",
     name: "Lümen Salon",
-    domain: "lumensalon.az",
     tag: "Salon",
     desc: "Gözəllik salonu — saç, dırnaq və üz baxımı, onlayn növbə.",
     prompt:
@@ -42,7 +38,6 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "clinic",
     name: "Dental Gülüm",
-    domain: "dentalgulum.az",
     tag: "Klinika",
     desc: "Diş klinikası — xidmətlər, həkimlər və onlayn qeydiyyat.",
     prompt:
@@ -51,7 +46,6 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "florist",
     name: "Gül Evi",
-    domain: "gulevi.az",
     tag: "Mağaza",
     desc: "Çiçək mağazası — buketlər və eyni gün çatdırılma.",
     prompt:
@@ -60,11 +54,26 @@ export const TEMPLATES: ReadonlyArray<TemplateMeta> = [
   {
     id: "store",
     name: "Ayla Store",
-    domain: "aylastore.az",
     tag: "E-ticarət",
     desc: "Onlayn mağaza — məhsul kataloqu və səbət.",
     prompt:
       "Onlayn geyim mağazası üçün sayt: məhsul kataloqu, kateqoriyalar, endirim banneri, məhsul kartları və qiymətlər, səbət və əlaqə bölməsi.",
+  },
+  {
+    id: "cafe",
+    name: "Köhnə Küçə",
+    tag: "Kafe",
+    desc: "Qəhvə evi — menyu, atmosfer və masa rezervasiyası.",
+    prompt:
+      "Bakıda müasir qəhvə evi üçün isti, zərif sayt: menyu və qiymətlər, haqqımızda hekayəsi, müştəri rəyləri, iş saatları və masa rezervasiyası forması.",
+  },
+  {
+    id: "gym",
+    name: "Forma Fitnes",
+    tag: "Fitnes",
+    desc: "Fitnes zalı — proqramlar, abunəlik və pulsuz sınaq.",
+    prompt:
+      "Müasir fitnes zalı üçün enerjili sayt: proqramlar, abunəlik planları və qiymətlər, avadanlıq, məşqçilər, üzv nəticələri və pulsuz sınaq günü qeydiyyat forması.",
   },
 ];
 

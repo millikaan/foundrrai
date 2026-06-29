@@ -114,7 +114,7 @@ export function PromptBox({
         className={cn(
           "relative mx-auto flex max-w-full flex-col rounded-[28px] border border-border bg-background/94 text-left shadow-[0_22px_70px_-38px_hsl(var(--primary)/0.55),0_1px_0_hsl(var(--background)/0.9)_inset] backdrop-blur-xl transition-all duration-300 focus-within:border-primary/45 focus-within:shadow-[0_26px_80px_-38px_hsl(var(--primary)/0.64),0_0_0_4px_hsl(var(--primary)/0.08)]",
           isHero
-            ? "w-[330px] max-w-[calc(100vw-40px)] rounded-[26px] border-white/75 bg-background/90 p-5 shadow-[0_26px_80px_-56px_hsl(var(--primary)/0.76),0_1px_0_hsl(var(--background)/0.96)_inset] sm:w-full sm:max-w-[640px] sm:p-6"
+            ? "w-full max-w-[720px] rounded-[26px] border-border/70 bg-background p-5 shadow-[0_24px_80px_-48px_hsl(var(--foreground)/0.18),0_1px_0_hsl(var(--background)/0.96)_inset] sm:p-6"
             : "w-[270px] p-3.5 sm:w-full sm:max-w-[760px] sm:p-5",
         )}
       >
@@ -128,7 +128,7 @@ export function PromptBox({
             isHero && "min-h-[92px] sm:min-h-[96px]",
           )}
         >
-          {value.length === 0 ? (
+          {value.length === 0 && typed.length > 0 ? (
             <span
               aria-hidden
               className={cn(
@@ -136,7 +136,7 @@ export function PromptBox({
                 isHero && "sm:text-[17px]",
               )}
             >
-              {typed || "Bakıda diş klinikası üçün sayt"}
+              {typed}
             </span>
           ) : null}
 
@@ -172,10 +172,7 @@ export function PromptBox({
             <button
               type="button"
               tabIndex={-1}
-              className={cn(
-                "hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex",
-                isHero && "sm:hidden",
-              )}
+              className="hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex"
             >
               <Paperclip className="h-3.5 w-3.5" />
               Əlavə et
@@ -183,10 +180,7 @@ export function PromptBox({
             <button
               type="button"
               tabIndex={-1}
-              className={cn(
-                "hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex",
-                isHero && "sm:hidden",
-              )}
+              className="hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex"
             >
               <Palette className="h-3.5 w-3.5" />
               Tema
@@ -214,7 +208,7 @@ export function PromptBox({
       </form>
 
       {showChips ? (
-        <div className="mx-auto mt-4 flex max-w-[270px] flex-wrap items-center justify-center gap-2 sm:mt-5 sm:max-w-none">
+        <div className="mx-auto mt-4 flex flex-wrap items-center justify-center gap-2 sm:mt-5">
           {CHIPS.map((chip) => (
             <Chip
               key={chip.label}

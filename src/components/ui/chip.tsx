@@ -19,7 +19,7 @@ export function Chip({ label, className, ...props }: ChipProps) {
       {...props}
     >
       {label}
-      <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/75 transition-opacity group-hover:text-foreground" />
+      <ArrowUpRight className="h-3.5 w-3.5 text-primary/70 transition-colors group-hover:text-primary" />
     </button>
   );
 }

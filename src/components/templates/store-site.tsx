@@ -289,7 +289,7 @@ export function StoreSite() {
                 </span>
                 <div>
                   <p className="text-sm font-medium text-neutral-900">E-poçt</p>
-                  <p className="text-sm text-neutral-500">salam@aylastore.az</p>
+                  <p className="text-sm text-neutral-500">+994 12 488 33 10</p>
                 </div>
               </div>
             </div>

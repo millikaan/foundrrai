@@ -84,7 +84,7 @@ export function CodeView({
   };
 
   return (
-    <div className="flex h-full bg-[hsl(240_22%_13%/0.02)]">
+    <div className="flex h-full bg-muted/30">
       {/* File tree */}
       <div className="w-56 shrink-0 overflow-y-auto border-r border-border bg-card/50 py-3">
         <p className="truncate px-4 pb-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
