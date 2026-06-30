@@ -4,27 +4,27 @@ import { Reveal } from "./reveal";
 
 export function Showcase() {
   return (
-    <section id="showcase" className="relative px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-[1080px]">
-        <Reveal className="max-w-[540px]">
+    <section id="showcase" className="relative px-5 py-20 sm:px-6 sm:py-24 lg:py-28">
+      <div className="mx-auto max-w-[1280px]">
+        <Reveal className="max-w-[560px]">
           <h2
-            className="font-semibold tracking-tight text-foreground"
-            style={{ fontSize: "clamp(28px, 3.6vw, 44px)", lineHeight: 1.08 }}
+            className="font-semibold tracking-[-0.03em] text-foreground"
+            style={{ fontSize: "clamp(32px, 4.2vw, 48px)", lineHeight: 1.06 }}
           >
-            Şablonları kəşf et
+            Foundrr ilə qurulanlar
           </h2>
-          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-            Növbəti layihəni hazır şablonla başlat.
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
+            Bir cümlədən başlayan saytlar — real bizneslər, real dizayn.
           </p>
         </Reveal>
 
-        <Reveal className="mt-8 sm:mt-10">
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-5 sm:gap-x-3 sm:gap-y-6 md:grid-cols-4 md:gap-x-3.5 md:gap-y-7">
-            {TEMPLATES.map((item) => (
-              <BrowserCard key={item.id} item={item} />
-            ))}
-          </div>
-        </Reveal>
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:mt-12 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+          {TEMPLATES.map((item, index) => (
+            <Reveal key={item.id} delay={index * 60}>
+              <BrowserCard item={item} />
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -76,21 +76,21 @@ export function HowItWorks() {
   return (
     <section
       id="how"
-      className="relative px-5 py-20 sm:px-6 sm:py-24 lg:py-28"
+      className="relative bg-[#faf9f7] px-5 py-20 sm:px-6 sm:py-24 lg:py-28 dark:bg-background"
     >
-      <div className="relative mx-auto max-w-[1120px]">
+      <div className="relative mx-auto max-w-[1180px]">
         <Reveal>
           <h2
-            className="font-semibold tracking-tight text-foreground"
-            style={{ fontSize: "clamp(36px, 5.2vw, 56px)", lineHeight: 1.04 }}
+            className="font-semibold tracking-[-0.03em] text-foreground"
+            style={{ fontSize: "clamp(36px, 5vw, 52px)", lineHeight: 1.06 }}
           >
-            Necə işləyir
+            Foundrr ilə tanış ol
           </h2>
         </Reveal>
 
-        <Reveal className="mt-10 lg:mt-14">
+        <Reveal className="mt-10 lg:mt-12">
           <div
-            className="grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 xl:gap-20"
+            className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-14 xl:gap-16"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
           >
@@ -116,7 +116,7 @@ function StepList({
   onSelect: (index: number) => void;
 }) {
   return (
-    <ol className="flex flex-col lg:pt-2">
+    <ol className="flex flex-col justify-center lg:min-h-[440px] lg:pl-2 xl:min-h-[480px]">
       {STEPS.map((step, index) => {
         const isActive = active === index;
 
@@ -124,30 +124,30 @@ function StepList({
           <li key={step.title}>
             <button
               type="button"
-              aria-current={isActive}
+              aria-current={isActive ? "step" : undefined}
               onClick={() => onSelect(index)}
-              className="group w-full py-6 text-left sm:py-8"
+              className="group w-full py-6 text-left sm:py-8 lg:py-9"
             >
               <p
                 className={cn(
-                  "font-semibold tracking-[-0.025em] transition-colors duration-500",
+                  "font-semibold tracking-[-0.02em] transition-[color,opacity] duration-[650ms] ease-out",
                   isActive
-                    ? "text-foreground"
-                    : "text-foreground/44 group-hover:text-foreground/56",
+                    ? "text-[#0a0a0a] dark:text-foreground"
+                    : "text-[#848484] group-hover:text-[#767676] dark:text-foreground/50 dark:group-hover:text-foreground/58",
                 )}
                 style={{
-                  fontSize: "clamp(26px, 2.6vw, 36px)",
-                  lineHeight: 1.14,
+                  fontSize: "clamp(30px, 3.4vw, 42px)",
+                  lineHeight: 1.16,
                 }}
               >
                 {step.title}
               </p>
               <p
                 className={cn(
-                  "mt-3 max-w-[380px] text-[16px] font-normal leading-[1.55] transition-colors duration-500 sm:text-[17px]",
+                  "mt-2 max-w-[420px] text-[15px] font-normal leading-[1.6] transition-[color,opacity] duration-[650ms] ease-out sm:mt-2.5 sm:text-[16px]",
                   isActive
-                    ? "text-foreground"
-                    : "text-foreground/44 group-hover:text-foreground/52",
+                    ? "text-[#1a1a1a] dark:text-foreground/92"
+                    : "text-[#a8a8a8] group-hover:text-[#989898] dark:text-foreground/38 dark:group-hover:text-foreground/44",
                 )}
               >
                 {step.body}
@@ -179,29 +179,31 @@ function DemoPanel({
   }, [paused]);
 
   return (
-    <div className="rounded-[28px] bg-card/90 p-5 sm:p-7 lg:p-9">
-      <div className="relative min-h-[340px] sm:min-h-[380px]">
-        <Phase show={active === 0}>
-          <PromptDemo
-            key={`prompt-${loopGen}`}
-            play={active === 0}
-            onComplete={complete}
-          />
-        </Phase>
-        <Phase show={active === 1}>
-          <BuildDemo
-            key={`build-${loopGen}`}
-            play={active === 1}
-            onComplete={complete}
-          />
-        </Phase>
-        <Phase show={active === 2}>
-          <FinishedDemo
-            key={`finished-${loopGen}`}
-            play={active === 2}
-            onComplete={complete}
-          />
-        </Phase>
+    <div className="flex min-h-[380px] items-center justify-center rounded-[28px] bg-[#f3f2ef] p-5 sm:min-h-[420px] sm:p-7 lg:min-h-[460px] lg:p-8 xl:min-h-[500px] dark:bg-[hsl(var(--foreground)/0.04)]">
+      <div className="relative w-full max-w-[560px]">
+        <div className="relative min-h-[320px] sm:min-h-[360px]">
+          <Phase show={active === 0}>
+            <PromptDemo
+              key={`prompt-${loopGen}`}
+              play={active === 0}
+              onComplete={complete}
+            />
+          </Phase>
+          <Phase show={active === 1}>
+            <BuildDemo
+              key={`build-${loopGen}`}
+              play={active === 1}
+              onComplete={complete}
+            />
+          </Phase>
+          <Phase show={active === 2}>
+            <FinishedDemo
+              key={`finished-${loopGen}`}
+              play={active === 2}
+              onComplete={complete}
+            />
+          </Phase>
+        </div>
       </div>
     </div>
   );
@@ -236,94 +238,153 @@ function PromptDemo({
   onComplete: () => void;
 }) {
   const [typed, setTyped] = React.useState("");
-  const [ready, setReady] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
+  const [sent, setSent] = React.useState(false);
   const [submitPulse, setSubmitPulse] = React.useState(false);
+  const [sendRing, setSendRing] = React.useState(false);
   const doneRef = React.useRef(false);
   const completeRef = React.useRef(onComplete);
   completeRef.current = onComplete;
+
+  const showToolbar = typed.length > 5;
 
   React.useEffect(() => {
     doneRef.current = false;
     if (!play) {
       setTyped("");
-      setReady(false);
+      setVisible(false);
+      setSent(false);
       setSubmitPulse(false);
+      setSendRing(false);
       return;
     }
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisible(true);
       setTyped(PROMPT);
-      setReady(true);
       const timer = window.setTimeout(() => completeRef.current(), 1200);
       return () => window.clearTimeout(timer);
     }
 
     setTyped("");
-    setReady(false);
+    setVisible(false);
+    setSent(false);
+    setSubmitPulse(false);
+    setSendRing(false);
+
     let char = 0;
     let timer: number;
 
     const finish = () => {
       if (doneRef.current) return;
       doneRef.current = true;
+      setSent(true);
       setSubmitPulse(true);
+      setSendRing(true);
       window.setTimeout(() => setSubmitPulse(false), 550);
-      timer = window.setTimeout(() => completeRef.current(), 900);
+      timer = window.setTimeout(() => completeRef.current(), 1100);
     };
 
     const tick = () => {
       char += 1;
       setTyped(PROMPT.slice(0, char));
-      setReady(char > 8);
 
       if (char >= PROMPT.length) {
         finish();
         return;
       }
 
-      timer = window.setTimeout(tick, 36 + Math.random() * 28);
+      timer = window.setTimeout(tick, 34 + Math.random() * 26);
     };
 
-    timer = window.setTimeout(tick, 320);
-    return () => window.clearTimeout(timer);
+    const startTyping = window.setTimeout(() => {
+      timer = window.setTimeout(tick, 280);
+    }, 520);
+
+    const showStage = window.setTimeout(() => setVisible(true), 120);
+
+    return () => {
+      window.clearTimeout(showStage);
+      window.clearTimeout(startTyping);
+      window.clearTimeout(timer);
+    };
   }, [play]);
 
   return (
-    <div className="demo-enter w-full max-w-[520px] rounded-[26px] border border-border/70 bg-background p-5 shadow-[0_1px_2px_hsl(var(--foreground)/0.04),0_24px_60px_-38px_hsl(var(--foreground)/0.2)] sm:p-6">
-      <p className="min-h-[88px] text-[16px] font-medium leading-relaxed text-foreground/82 sm:min-h-[100px] sm:text-[17px]">
-        {typed.length > 0 ? (
-          <>
-            {typed}
-            <span className="cursor-blink ml-0.5 inline-block h-[18px] w-[2px] bg-primary align-middle" />
-          </>
-        ) : null}
-      </p>
+    <div className="relative mx-auto w-full max-w-[500px]">
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-[32px] bg-[#e8edf4] px-5 py-9 sm:px-7 sm:py-11 dark:bg-[hsl(var(--foreground)/0.07)]",
+          visible && "preview-stage-in",
+          !visible && "opacity-0",
+        )}
+      >
+        <div
+          aria-hidden
+          className={cn("preview-aurora", visible && "preview-aurora-active")}
+        />
 
-      <div className="mt-5 flex items-center justify-between gap-3">
         <div
           className={cn(
-            "flex items-center gap-2 transition-all duration-500",
-            ready ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
+            "relative rounded-[22px] border border-black/[0.05] bg-white p-5 shadow-[0_2px_8px_-2px_hsl(var(--foreground)/0.06),0_20px_48px_-24px_hsl(var(--foreground)/0.18)] transition-shadow duration-500 dark:border-white/10 dark:bg-card sm:p-6",
+            sent && "shadow-[0_4px_12px_-4px_hsl(var(--foreground)/0.08),0_28px_56px_-28px_hsl(var(--foreground)/0.22)]",
           )}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)]">
-            <Plus className="h-4 w-4" />
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)]">
-            <Paperclip className="h-3.5 w-3.5" />
-            Əlavə et
-          </span>
-        </div>
+          <p className="min-h-[72px] text-[15px] font-medium leading-[1.65] text-foreground/88 sm:min-h-[80px] sm:text-[16px]">
+            {typed.length > 0 ? (
+              <>
+                {typed}
+                {!sent ? (
+                  <span className="cursor-blink ml-0.5 inline-block h-[17px] w-[2px] bg-primary align-middle" />
+                ) : null}
+              </>
+            ) : visible ? (
+              <span className="cursor-blink inline-block h-[17px] w-[2px] bg-primary align-middle" />
+            ) : null}
+          </p>
 
-        <span
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background shadow-[0_10px_24px_-14px_hsl(var(--foreground)/0.55)] transition-all duration-500",
-            ready ? "translate-y-0 opacity-100" : "translate-y-1 opacity-40",
-            submitPulse && "submit-pop",
-          )}
-        >
-          <ArrowUp className="h-4 w-4" />
-        </span>
+          <div className="mt-4 flex items-center justify-between gap-3 sm:mt-5">
+            <div
+              className={cn(
+                "flex items-center gap-2 transition-opacity duration-300",
+                !showToolbar && "pointer-events-none opacity-0",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-muted-foreground shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] dark:border-white/10 dark:bg-background",
+                  showToolbar && "prompt-tool-in",
+                )}
+                style={{ animationDelay: showToolbar ? "0ms" : undefined }}
+              >
+                <Plus className="h-4 w-4" />
+              </span>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] dark:border-white/10 dark:bg-background",
+                  showToolbar && "prompt-tool-in",
+                )}
+                style={{ animationDelay: showToolbar ? "90ms" : undefined }}
+              >
+                <Paperclip className="h-3.5 w-3.5" />
+                Əlavə et
+              </span>
+            </div>
+
+            <span
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full bg-[#0a0a0a] text-white shadow-[0_8px_20px_-10px_hsl(var(--foreground)/0.55)] transition-all duration-500 dark:bg-foreground dark:text-background",
+                showToolbar ? "prompt-tool-in opacity-100" : "pointer-events-none opacity-0",
+                submitPulse && "submit-pop",
+                sendRing && "send-ring",
+                sent && "scale-95 opacity-80",
+              )}
+              style={{ animationDelay: showToolbar ? "160ms" : undefined }}
+            >
+              <ArrowUp className="h-4 w-4" />
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -372,7 +433,7 @@ function BuildDemo({
   }, [play]);
 
   return (
-    <PreviewFrame building className="demo-enter">
+    <PreviewFrame building showBuildBar className="demo-enter">
       <MockSite level={level} />
       <BuildStatus level={level} />
     </PreviewFrame>
@@ -398,6 +459,14 @@ function FinishedDemo({
   return (
     <PreviewFrame ready className="demo-enter">
       <MockSite level={8} polished />
+      {play ? (
+        <div className="ready-badge-in pointer-events-none absolute bottom-5 left-1/2 z-20">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-[12px] font-semibold text-background shadow-[0_12px_32px_-16px_hsl(var(--foreground)/0.55)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#28c840]" />
+            Hazır — yayımla
+          </span>
+        </div>
+      ) : null}
     </PreviewFrame>
   );
 }
@@ -405,11 +474,13 @@ function FinishedDemo({
 function PreviewFrame({
   building = false,
   ready = false,
+  showBuildBar = false,
   className,
   children,
 }: {
   building?: boolean;
   ready?: boolean;
+  showBuildBar?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -421,6 +492,11 @@ function PreviewFrame({
       )}
     >
       <BrowserChrome building={building} ready={ready} />
+      {showBuildBar ? (
+        <div className="h-[3px] w-full bg-border/30">
+          <div className="build-bar h-full rounded-r-full bg-primary/75" />
+        </div>
+      ) : null}
 
       <div className="relative aspect-[4/3] w-full min-h-[260px] overflow-hidden bg-[hsl(var(--preview-canvas))] sm:min-h-[300px]">
         {children}

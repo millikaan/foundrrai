@@ -1,8 +1,9 @@
 import { Reveal } from "./reveal";
+
 const STATS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: "250+", label: "sayt made" },
-  { value: "70+", label: "published" },
-  { value: "500", label: "signups" },
+  { value: "250+", label: "Qurulmuş sayt" },
+  { value: "70+", label: "Yayımlanan layihə" },
+  { value: "500", label: "Qeydiyyat" },
 ];
 
 export function Stats() {
@@ -23,19 +24,19 @@ export function Stats() {
           </div>
         </Reveal>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {STATS.map((stat, index) => (
             <Reveal key={stat.label} delay={index * 110}>
-              <div className="flex min-h-[160px] flex-col justify-between rounded-[20px] border border-border/80 bg-card/80 px-6 py-6 transition-transform duration-300 hover:-translate-y-0.5 sm:min-h-[172px]">
+              <div className="flex min-h-[132px] flex-col justify-between rounded-2xl border border-black/[0.06] bg-white/80 px-5 py-5 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] backdrop-blur-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-card/80 sm:min-h-[140px] sm:px-6 sm:py-6">
+                <p className="text-[13px] font-medium text-muted-foreground sm:text-[14px]">
+                  {stat.label}
+                </p>
                 <div
-                  className="font-semibold leading-none tracking-tight text-foreground"
-                  style={{ fontSize: "clamp(44px, 5.5vw, 60px)" }}
+                  className="mt-4 font-semibold leading-none tracking-tight text-foreground"
+                  style={{ fontSize: "clamp(40px, 5vw, 56px)" }}
                 >
                   {stat.value}
                 </div>
-                <p className="max-w-[15rem] text-[14.5px] font-medium leading-relaxed text-foreground/62">
-                  {stat.label}
-                </p>
               </div>
             </Reveal>
           ))}

@@ -15,12 +15,6 @@ const NAV_LINKS = [
   { href: "/status", label: "Status" },
 ];
 
-const MOBILE_NAV_LINKS = [
-  { href: "/#how", label: "Necə işləyir" },
-  { href: "/#showcase", label: "Nümunələr" },
-  { href: "/pricing", label: "Qiymət" },
-];
-
 export interface NavUser {
   name: string;
   email: string;
@@ -47,36 +41,24 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
           : "border-transparent bg-transparent backdrop-blur-none",
       )}
     >
-      <nav className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-6">
-        <Link href="/" className="font-semibold tracking-tight">
+      <nav className="mx-auto grid h-[72px] max-w-[1180px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-6">
+        <Link href="/" className="justify-self-start font-semibold tracking-tight">
           <FoundrrLogo markSize={20} wordmarkClassName="text-[18px]" />
         </Link>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center justify-center gap-0.5 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
               href={link.href}
-              className="rounded-lg px-3.5 py-2 text-[14px] font-medium text-foreground transition-colors hover:bg-muted/70"
+              className="rounded-lg px-3 py-2 text-[14px] font-medium text-foreground/90 transition-colors hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </div>
 
-        <div className="hidden items-center gap-1 max-md:flex max-sm:hidden">
-          {MOBILE_NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="rounded-lg px-2.5 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-muted/70"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-self-end gap-2">
           {user ? (
             <ProfileMenu
               name={user.name}
@@ -90,14 +72,17 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
                 href="/login"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "sm" }),
-                  "hidden sm:inline-flex",
+                  "hidden rounded-full border-black/[0.12] bg-white/80 sm:inline-flex dark:border-white/15 dark:bg-card/80",
                 )}
               >
                 Daxil ol
               </Link>
               <Link
                 href="/signup?intent=build"
-                className={buttonVariants({ variant: "accent", size: "sm" })}
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "rounded-full bg-foreground px-4 text-background hover:bg-foreground/90",
+                )}
               >
                 Başla
               </Link>

@@ -19,6 +19,7 @@ export interface ShowcaseItem {
   name: string;
   tag: string;
   desc: string;
+  domain: string;
 }
 
 /** Scaled template preview — top-anchored, non-interactive. */
@@ -39,23 +40,27 @@ export function BrowserCard({
 }) {
   return (
     <div className={cn("group relative min-w-0", className)}>
-      <div className="relative aspect-[16/10] overflow-hidden rounded-[10px] bg-muted/30 transition-shadow duration-300 group-hover:shadow-[0_12px_32px_-24px_hsl(var(--foreground)/0.28)] md:rounded-xl">
-        <Template id={item.id} />
+      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-black/[0.06] bg-[hsl(var(--preview-canvas))] shadow-[0_1px_2px_hsl(var(--foreground)/0.04),0_8px_24px_-16px_hsl(var(--foreground)/0.08)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-black/[0.08] group-hover:shadow-[0_24px_56px_-32px_hsl(var(--foreground)/0.18)] dark:border-white/10 dark:group-hover:border-white/14">
+        <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-[1.02]">
+          <Template id={item.id} />
+        </div>
       </div>
 
-      <div className="pointer-events-none pt-2 md:pt-2.5">
-        <p className="truncate text-[12px] font-semibold tracking-tight text-foreground md:text-[14px]">
-          {item.name}
-        </p>
-        <p className="mt-0.5 line-clamp-1 text-[10px] leading-snug text-muted-foreground md:text-[12px]">
-          {item.desc}
-        </p>
+      <div className="pointer-events-none pt-3 sm:pt-3.5">
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-semibold tracking-tight text-foreground sm:text-[14px]">
+            {item.name}
+          </p>
+          <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-muted-foreground">
+            {item.desc}
+          </p>
+        </div>
       </div>
 
       <Link
         href={`/templates/${item.id}`}
         aria-label={item.name}
-        className="absolute inset-0 z-10 rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:rounded-xl"
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       />
     </div>
   );

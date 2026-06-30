@@ -2,20 +2,18 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUp, Mic, Paperclip, Palette, Plus } from "lucide-react";
+import { ArrowUp, ChevronDown, Mic, Plus } from "lucide-react";
 
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
 
 const PLACEHOLDERS = [
-  "Bakıda diş klinikası üçün sayt",
-  "Gül mağazası üçün çatdırılma saytı",
-  "Rent-a-car şirkəti üçün icarə saytı",
-  "Restoran üçün menyu və rezervasiya saytı",
-  "Gözəllik salonu üçün onlayn növbə saytı",
-  "Onlayn geyim mağazası",
-  "Fitnes klubu üçün sayt",
-  "Kofe evi üçün vebsayt",
+  "restoran saytı yarat",
+  "diş klinikası üçün landing səhifə hazırla",
+  "gül mağazası üçün çatdırılma saytı qur",
+  "fitnes klubu üçün vebsayt dizayn et",
+  "rent-a-car üçün rezervasiya saytı yarat",
+  "barbershop üçün onlayn qeydiyyat səhifəsi",
 ];
 
 const CHIPS: ReadonlyArray<{ label: string; prompt: string }> = [
@@ -112,10 +110,10 @@ export function PromptBox({
           submit();
         }}
         className={cn(
-          "relative mx-auto flex max-w-full flex-col rounded-[28px] border border-border bg-background/94 text-left shadow-[0_22px_70px_-38px_hsl(var(--primary)/0.55),0_1px_0_hsl(var(--background)/0.9)_inset] backdrop-blur-xl transition-all duration-300 focus-within:border-primary/45 focus-within:shadow-[0_26px_80px_-38px_hsl(var(--primary)/0.64),0_0_0_4px_hsl(var(--primary)/0.08)]",
+          "relative mx-auto flex max-w-full flex-col text-left transition-all duration-300",
           isHero
-            ? "w-full max-w-[720px] rounded-[26px] border-border/70 bg-background p-5 shadow-[0_24px_80px_-48px_hsl(var(--foreground)/0.18),0_1px_0_hsl(var(--background)/0.96)_inset] sm:p-6"
-            : "w-[270px] p-3.5 sm:w-full sm:max-w-[760px] sm:p-5",
+            ? "w-full rounded-[32px] border border-black/[0.05] bg-white p-5 shadow-[0_4px_24px_-4px_hsl(var(--foreground)/0.08),0_12px_48px_-16px_hsl(var(--foreground)/0.12)] focus-within:border-black/[0.07] focus-within:shadow-[0_4px_28px_-4px_hsl(var(--foreground)/0.1),0_16px_56px_-16px_hsl(var(--foreground)/0.14)] dark:border-white/10 dark:bg-card dark:shadow-[0_8px_40px_-12px_hsl(0_0%_0%/0.45)] sm:p-6"
+            : "flex-col rounded-[28px] border border-border bg-background/94 p-3.5 shadow-[0_22px_70px_-38px_hsl(var(--primary)/0.55),0_1px_0_hsl(var(--background)/0.9)_inset] backdrop-blur-xl focus-within:border-primary/45 focus-within:shadow-[0_26px_80px_-38px_hsl(var(--primary)/0.64),0_0_0_4px_hsl(var(--primary)/0.08)] sm:w-full sm:max-w-[760px] sm:p-5 w-[270px]",
         )}
       >
         <label htmlFor="foundrr-prompt" className="sr-only">
@@ -124,26 +122,33 @@ export function PromptBox({
 
         <div
           className={cn(
-            "relative min-h-[76px] px-1.5 pt-1 sm:min-h-[112px]",
-            isHero && "min-h-[92px] sm:min-h-[96px]",
+            "relative px-0.5",
+            isHero ? "min-h-[64px] sm:min-h-[72px]" : "min-h-[76px] px-1.5 pt-1 sm:min-h-[112px]",
           )}
         >
           {value.length === 0 && typed.length > 0 ? (
             <span
               aria-hidden
               className={cn(
-                "pointer-events-none absolute left-1.5 top-1 text-[16px] font-medium text-muted-foreground sm:text-[17px]",
-                isHero && "sm:text-[17px]",
+                "pointer-events-none absolute left-0.5 top-0 text-[16px] text-muted-foreground sm:text-[17px]",
+                isHero && "font-normal",
               )}
             >
-              {typed}
+              {isHero ? (
+                <>
+                  <span className="text-foreground/75">Foundrr-dən </span>
+                  {typed}
+                </>
+              ) : (
+                typed
+              )}
             </span>
           ) : null}
 
           <textarea
             id="foundrr-prompt"
             ref={textareaRef}
-            rows={2}
+            rows={isHero ? 1 : 2}
             value={value}
             onChange={(event) => setValue(event.target.value)}
             onKeyDown={onKeyDown}
@@ -153,55 +158,54 @@ export function PromptBox({
             data-gramm_editor="false"
             data-enable-grammarly="false"
             className={cn(
-              "block w-full resize-none bg-transparent text-[16px] font-medium leading-relaxed text-foreground outline-none placeholder:text-transparent sm:text-[17px]",
-              isHero && "sm:text-[17px]",
+              "block w-full resize-none bg-transparent leading-relaxed text-foreground outline-none placeholder:text-transparent",
+              isHero
+                ? "min-h-[64px] pt-0.5 text-[16px] font-normal sm:min-h-[72px] sm:text-[17px]"
+                : "text-[16px] font-medium sm:text-[17px]",
             )}
           />
         </div>
 
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              aria-label="Əlavə et"
-              tabIndex={-1}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              tabIndex={-1}
-              className="hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex"
-            >
-              <Paperclip className="h-3.5 w-3.5" />
-              Əlavə et
-            </button>
-            <button
-              type="button"
-              tabIndex={-1}
-              className="hidden items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground shadow-[0_1px_1px_hsl(var(--foreground)/0.04)] transition-colors hover:text-foreground sm:inline-flex"
-            >
-              <Palette className="h-3.5 w-3.5" />
-              Tema
-            </button>
-          </div>
+        <div className={cn("flex items-center justify-between gap-2", isHero ? "mt-3" : "mt-1")}>
+          <button
+            type="button"
+            aria-label="Əlavə et"
+            tabIndex={-1}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/10"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {isHero ? (
+              <button
+                type="button"
+                tabIndex={-1}
+                className="hidden items-center gap-1 rounded-full px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-black/[0.04] hover:text-foreground sm:inline-flex dark:hover:bg-white/10"
+              >
+                Qur
+                <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+              </button>
+            ) : null}
             <button
               type="button"
               aria-label="Səslə yaz"
               tabIndex={-1}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/10"
             >
               <Mic className="h-4 w-4" />
             </button>
             <button
               type="submit"
               aria-label="Saytı qur"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_18px_-10px_hsl(var(--primary)/0.9)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[hsl(var(--primary-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={cn(
+                "flex items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                isHero
+                  ? "h-9 w-9 bg-foreground text-background hover:opacity-90 sm:h-10 sm:w-10"
+                  : "h-10 w-10 bg-primary text-primary-foreground shadow-[0_8px_18px_-10px_hsl(var(--primary)/0.9)] hover:-translate-y-0.5 hover:bg-[hsl(var(--primary-hover))]",
+              )}
             >
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp className={isHero ? "h-4 w-4 sm:h-5 sm:w-5" : "h-5 w-5"} />
             </button>
           </div>
         </div>
